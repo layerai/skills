@@ -43,7 +43,7 @@ tests/<name>/                # tests for any script shipped with skill <name>
 Supporting files sit next to a SKILL.md only when the content is too large to inline, and must be
 linked directly from SKILL.md: agents resolve file references one level deep, so a reference chained
 through another supporting file may never be read. A skill's own `README.md` is the one exemption
-(`yarn skill-files` skips it): it documents the skill for maintainers, not for the agent running it,
+(`pnpm skill-files` skips it): it documents the skill for maintainers, not for the agent running it,
 and linking it would spend body words inviting a runtime agent to read maintainer notes as
 instructions.
 
@@ -75,8 +75,8 @@ description never fires.
 
 ### Body
 
-- 1000 words is the house target. The build fails past 2500 (`yarn style`).
-- Measure the exact number `yarn style` checks:
+- 1000 words is the house target. The build fails past 2500 (`pnpm style`).
+- Measure the exact number `pnpm style` checks:
   `awk '/^---$/{c++; next} c>=2' skills/<name>/SKILL.md | wc -w`
 - Structure: Overview, Quick reference, one excellent worked example, Common mistakes.
 - Why a budget at all: the body enters context only when the skill triggers, and then every word
@@ -179,32 +179,32 @@ for a machine.
 
 ## Tooling
 
-One-time setup: `yarn install`, which installs prettier, cspell, commitlint, and the husky hooks.
+One-time setup: `pnpm install`, which installs prettier, cspell, commitlint, and the husky hooks.
 
-`yarn validate` is the gate, run identically by the pre-commit hook and by CI:
+`pnpm validate` is the gate, run identically by the pre-commit hook and by CI:
 
 | Script                | Checks                                                                      |
 | --------------------- | --------------------------------------------------------------------------- |
-| `yarn style`          | Body word budget, em dashes, frontmatter contract, house style              |
-| `yarn format:check`   | prettier                                                                    |
-| `yarn skill-files`    | Supporting files are linked from SKILL.md and parse; `README.md` exempt     |
-| `yarn groupings`      | Every skill is in a `skills.sh.json` grouping and every listed skill exists |
-| `yarn manifest:check` | Plugin manifests match `skills.sh.json` and `VERSION`                       |
-| `yarn readme`         | The README skills table mirrors `skills.sh.json`                            |
-| `yarn spell`          | cspell                                                                      |
-| `yarn spec`           | `skills-ref validate` on every skill                                        |
+| `pnpm style`          | Body word budget, em dashes, frontmatter contract, house style              |
+| `pnpm format:check`   | prettier                                                                    |
+| `pnpm skill-files`    | Supporting files are linked from SKILL.md and parse; `README.md` exempt     |
+| `pnpm groupings`      | Every skill is in a `skills.sh.json` grouping and every listed skill exists |
+| `pnpm manifest:check` | Plugin manifests match `skills.sh.json` and `VERSION`                       |
+| `pnpm readme`         | The README skills table mirrors `skills.sh.json`                            |
+| `pnpm spell`          | cspell                                                                      |
+| `pnpm spec`           | `skills-ref validate` on every skill                                        |
 
-`yarn tools:check` is deliberately outside that chain. It verifies every MCP tool a skill names
+`pnpm tools:check` is deliberately outside that chain. It verifies every MCP tool a skill names
 against the public manifest, which needs network, and the pre-commit hook has to work offline. CI
 runs it on every pull request and daily on a schedule, because the manifest changes when Layer ships
 and this repository does not: a renamed tool turns a correct skill into one that teaches an agent to
 invent a call, and only a scheduled check sees that.
 
-Run `yarn format` before `yarn validate` after writing markdown: prettier reflows prose and rewrites
+Run `pnpm format` before `pnpm validate` after writing markdown: prettier reflows prose and rewrites
 tables, so `format:check` rejects correct hand-written markdown.
 
 `skills.sh.json` is the single source of truth for grouping. `.claude-plugin/marketplace.json` and
-the README skills table are generated from it (`yarn manifest`, `yarn readme --fix`); never edit
+the README skills table are generated from it (`pnpm manifest`, `pnpm readme --fix`); never edit
 either by hand.
 
 Conventional Commits, enforced by commitlint. Valid scopes are the skill directory names plus

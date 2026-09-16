@@ -96,7 +96,7 @@ const targets = [
 ];
 
 // Format through prettier with the repo config, so a generated manifest and a
-// formatted one can never disagree and fail `yarn validate` against each other.
+// formatted one can never disagree and fail `pnpm validate` against each other.
 const format = async (value, path) =>
   prettier.format(JSON.stringify(value), {
     ...(await prettier.resolveConfig(path)),
@@ -114,7 +114,7 @@ for (const [path, value] of targets) {
       /* missing counts as drift */
     }
     if (current !== next) {
-      console.error(`ERROR ${path} is out of date; run \`yarn manifest\``);
+      console.error(`ERROR ${path} is out of date; run \`pnpm manifest\``);
       failed = true;
     } else {
       console.log(`OK ${path}`);

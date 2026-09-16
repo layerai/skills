@@ -8,10 +8,10 @@
     "url": "https://github.com/layerai/skills.git"
   },
   "license": "MIT",
-  "packageManager": "yarn@4.6.0",
+  "packageManager": "pnpm@10.18.0",
   "scripts": {
     "prepare": "husky",
-    "validate": "yarn style && yarn format:check && yarn skill-files && yarn groupings && yarn manifest:check && yarn readme && yarn version:check && yarn spell && yarn spec",
+    "validate": "pnpm style && pnpm format:check && pnpm skill-files && pnpm groupings && pnpm manifest:check && pnpm readme && pnpm version:check && pnpm spell && pnpm spec",
     "style": "node ./scripts/check-style.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -130,8 +130,8 @@ rules, the description format, the word budget, the ban on hard-coded model ids,
 test every new skill has to pass. [CONTRIBUTING.md](CONTRIBUTING.md) covers the mechanics.
 
 ```bash
-yarn install
-yarn format && yarn validate
+pnpm install
+pnpm format && pnpm validate
 ```
 
 ## License

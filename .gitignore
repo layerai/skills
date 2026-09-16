@@ -1,12 +1,5 @@
 node_modules/
 .DS_Store
 *.log
-.yarn/*
-!.yarn/patches
-!.yarn/releases
-!.yarn/plugins
-!.yarn/versions
-.pnp.*
-.yarn/cache
 evals/**/out/
 .husky/_/

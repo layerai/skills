@@ -1,6 +1,6 @@
 # Evals
 
-Mechanical validation (`yarn validate`) checks that a skill is well formed. It cannot tell you
+Mechanical validation (`pnpm validate`) checks that a skill is well formed. It cannot tell you
 whether the skill teaches. That is what the application test does, and it is the gate a new or
 changed skill has to pass before merging.
 

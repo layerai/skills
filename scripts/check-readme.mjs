@@ -57,5 +57,5 @@ if (fix) {
   process.exit(0);
 }
 
-console.error("ERROR README.md skills section is out of date; run `yarn readme:fix`");
+console.error("ERROR README.md skills section is out of date; run `pnpm readme:fix`");
 process.exit(1);

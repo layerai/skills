@@ -17,33 +17,35 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
-      - uses: astral-sh/setup-uv@v5
-      - name: Enable corepack
-        run: corepack enable
+          cache: pnpm
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
       - name: Install
-        run: yarn install --immutable
+        run: pnpm install --frozen-lockfile
       - name: House style and word budget
-        run: yarn style
+        run: pnpm style
       - name: Formatting
-        run: yarn format:check
+        run: pnpm format:check
       - name: Supporting files
-        run: yarn skill-files
+        run: pnpm skill-files
       - name: Groupings
-        run: yarn groupings
+        run: pnpm groupings
       - name: Plugin manifests
-        run: yarn manifest:check
+        run: pnpm manifest:check
       - name: README skills table
-        run: yarn readme
+        run: pnpm readme
       - name: Version sync
-        run: yarn version:check
+        run: pnpm version:check
       - name: Spelling
-        run: yarn spell
+        run: pnpm spell
       - name: Spec validation
-        run: yarn spec
+        run: pnpm spec
       - name: Plugin JSON is valid
         run: |
           for f in .claude-plugin/*.json .cursor-plugin/*.json .codex-plugin/*.json mcp.json .mcp.json; do

@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # pnpm is covered by the npm ecosystem.
   # Dev tooling only: nothing here ships to a user, so the risk is a broken build,
   # not a broken skill. Grouped into one pull request a week to keep the noise down.
   - package-ecosystem: npm

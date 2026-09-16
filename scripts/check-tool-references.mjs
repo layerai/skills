@@ -6,7 +6,7 @@
 // taught `get_model_recommendations`, a tool that has never existed, and nothing
 // caught it. An agent following that instruction invents a call and fails.
 //
-// Needs network, so it is not part of `yarn validate` (which the pre-commit hook
+// Needs network, so it is not part of `pnpm validate` (which the pre-commit hook
 // runs offline). CI runs it on every pull request and on a schedule, because the
 // manifest can change without this repository changing.
 import { readFileSync } from "node:fs";

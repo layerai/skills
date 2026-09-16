@@ -1,6 +1,6 @@
-yarn manifest
-yarn readme:fix
+pnpm manifest
+pnpm readme:fix
 git diff --cached --quiet -- .claude-plugin .cursor-plugin .codex-plugin README.md || {
   git add -u .claude-plugin .cursor-plugin .codex-plugin README.md 2> /dev/null || true
 }
-yarn validate
+pnpm validate

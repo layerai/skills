@@ -2,8 +2,12 @@
   "version": "0.2",
   "language": "en,en-GB",
   "dictionaryDefinitions": [
-    { "name": "project-words", "path": "./project-words.txt", "addWords": true }
+    {
+      "name": "project-words",
+      "path": "./project-words.txt",
+      "addWords": true
+    }
   ],
   "dictionaries": ["project-words"],
-  "ignorePaths": ["node_modules/**", "yarn.lock", "CHANGELOG.md", ".git/**"]
+  "ignorePaths": ["node_modules/**", "pnpm-lock.yaml", "CHANGELOG.md", ".git/**"]
 }

@@ -19,10 +19,10 @@ Thanks for helping improve the Layer Agent Skills. This guide covers the mechani
 ```bash
 git clone https://github.com/layerai/skills.git
 cd skills
-yarn install
+pnpm install
 ```
 
-`yarn install` sets up prettier, cspell, commitlint, and the husky hooks, so every commit runs the
+`pnpm install` sets up prettier, cspell, commitlint, and the husky hooks, so every commit runs the
 checks CI runs.
 
 ## Authoring a skill
@@ -37,12 +37,12 @@ be verifiable from a public surface.** Anything else is a guess, even when it ha
 ## Validating
 
 ```bash
-yarn format   # prettier reflows prose, so run it before validate
-yarn validate # style, formatting, supporting files, groupings, manifests, README, spelling, spec
+pnpm format   # prettier reflows prose, so run it before validate
+pnpm validate # style, formatting, supporting files, groupings, manifests, README, spelling, spec
 ```
 
 `skills.sh.json` is the source of truth for grouping. The plugin manifests and the README skills
-table are generated from it, so never edit those by hand; `yarn manifest` and `yarn readme:fix`
+table are generated from it, so never edit those by hand; `pnpm manifest` and `pnpm readme:fix`
 regenerate them, and the pre-commit hook does it for you.
 
 A new or changed skill also needs the application test from

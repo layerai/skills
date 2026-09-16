@@ -4,8 +4,8 @@
 
 ## Checks
 
-- [ ] `yarn format && yarn validate` passes locally
-- [ ] `yarn tools:check` passes (every tool named is in the public manifest)
+- [ ] `pnpm format && pnpm validate` passes locally
+- [ ] `pnpm tools:check` passes (every tool named is in the public manifest)
 - [ ] Every new factual claim is verifiable from a public surface (tool reference, MCP manifest, or the server's own instructions)
 - [ ] No `base_model_id` asserted as a constant, outside the sanctioned first-party utilities
 - [ ] Nothing here is internal: no hostnames, workspace or project ids, signed URLs, or credentials

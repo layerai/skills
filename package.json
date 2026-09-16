@@ -23,7 +23,8 @@
     "readme:fix": "node ./scripts/check-readme.mjs --fix",
     "version:check": "node ./scripts/check-version-sync.mjs",
     "spell": "cspell --no-progress --no-summary \"**/*.md\" \"**/*.json\"",
-    "spec": "./scripts/validate-skills.sh"
+    "spec": "./scripts/validate-skills.sh",
+    "tools:check": "node ./scripts/check-tool-references.mjs"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.3",

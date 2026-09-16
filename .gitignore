@@ -9,3 +9,4 @@ node_modules/
 .pnp.*
 .yarn/cache
 evals/**/out/
+.husky/_/

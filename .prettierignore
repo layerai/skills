@@ -2,3 +2,4 @@ node_modules/
 VERSION
 CHANGELOG.md
 evals/**/fixtures/
+.husky/_/

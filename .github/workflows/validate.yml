@@ -1,0 +1,45 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: astral-sh/setup-uv@v5
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install
+        run: yarn install --immutable
+      - name: House style and word budget
+        run: yarn style
+      - name: Formatting
+        run: yarn format:check
+      - name: Supporting files
+        run: yarn skill-files
+      - name: Groupings
+        run: yarn groupings
+      - name: Plugin manifests
+        run: yarn manifest:check
+      - name: README skills table
+        run: yarn readme
+      - name: Version sync
+        run: yarn version:check
+      - name: Spelling
+        run: yarn spell
+      - name: Spec validation
+        run: yarn spec
+      - name: Plugin JSON is valid
+        run: |
+          for f in .claude-plugin/*.json .cursor-plugin/*.json .codex-plugin/*.json mcp.json .mcp.json; do
+            jq -e . "$f" > /dev/null || { echo "::error::Invalid JSON: $f"; exit 1; }
+            echo "OK $f"
+          done

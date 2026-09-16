@@ -1,0 +1,46 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "notGrouped": "bottom",
+  "groupings": [
+    {
+      "title": "Getting started",
+      "description": "Connect to Layer and learn the generation loop every other skill builds on: model discovery, the spend gate, uploads, and polling.",
+      "skills": ["layer"]
+    },
+    {
+      "title": "Direction",
+      "description": "Agree a look before generating at volume: moodboards, storyboards, colour, era, and framing.",
+      "skills": ["layer-art-direction"]
+    },
+    {
+      "title": "Images",
+      "description": "Generate stills and change the ones you already have: prompting, sizing, references, masked edits, reframing, upscaling, and layers.",
+      "skills": ["layer-image", "layer-image-editing"]
+    },
+    {
+      "title": "Game art",
+      "description": "Art that has to sit in a system: characters and casts, environments and parallax, game UI, pixel sprites and sheets, and seamless textures.",
+      "skills": ["layer-game-assets", "layer-pixel-art", "layer-textures"]
+    },
+    {
+      "title": "Video and audio",
+      "description": "Motion and sound: animating stills, camera and loops, sound effects, music, speech, and cutting shots into one finished video.",
+      "skills": ["layer-video", "layer-audio", "layer-video-timeline"]
+    },
+    {
+      "title": "3D",
+      "description": "Meshes for a game engine: generation from text or image, remeshing, retexturing, rigging, and animation.",
+      "skills": ["layer-3d"]
+    },
+    {
+      "title": "Consistency and pipelines",
+      "description": "Hold one look across a whole project with trained reference sets, and run the Blueprint workflows a studio has already built.",
+      "skills": ["layer-reference-sets", "layer-workflows"]
+    },
+    {
+      "title": "Review",
+      "description": "Judge a batch before it ships: scoring rules, verdicts, and reviewing a set against the brief.",
+      "skills": ["layer-quality"]
+    }
+  ]
+}

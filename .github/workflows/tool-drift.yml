@@ -32,6 +32,9 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 22
+          # The check uses only node built-ins and fetch, so no install runs here.
+          # Left on, setup-node reads packageManager, looks for pnpm, and fails.
+          package-manager-cache: false
       - name: Check tool references against the public manifest
         run: node ./scripts/check-tool-references.mjs
 

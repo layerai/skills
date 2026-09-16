@@ -194,6 +194,12 @@ One-time setup: `yarn install`, which installs prettier, cspell, commitlint, and
 | `yarn spell`          | cspell                                                                      |
 | `yarn spec`           | `skills-ref validate` on every skill                                        |
 
+`yarn tools:check` is deliberately outside that chain. It verifies every MCP tool a skill names
+against the public manifest, which needs network, and the pre-commit hook has to work offline. CI
+runs it on every pull request and daily on a schedule, because the manifest changes when Layer ships
+and this repository does not: a renamed tool turns a correct skill into one that teaches an agent to
+invent a call, and only a scheduled check sees that.
+
 Run `yarn format` before `yarn validate` after writing markdown: prettier reflows prose and rewrites
 tables, so `format:check` rejects correct hand-written markdown.
 

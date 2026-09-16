@@ -4,8 +4,8 @@
 
 ## Checks
 
-- [ ] `pnpm format && pnpm validate` passes locally
-- [ ] `pnpm tools:check` passes (every tool named is in the public manifest)
+- [ ] `task format && task check` passes locally
+- [ ] `task tools:check` and `task links` pass
 - [ ] Every new factual claim is verifiable from a public surface (tool reference, MCP manifest, or the server's own instructions)
 - [ ] No `base_model_id` asserted as a constant, outside the sanctioned first-party utilities
 - [ ] Nothing here is internal: no hostnames, workspace or project ids, signed URLs, or credentials

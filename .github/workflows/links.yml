@@ -1,8 +1,9 @@
 name: Links
 
-# Every factual claim in a skill is supposed to be verifiable from a public surface,
-# and the skills carry the links that prove it. A link that rots takes the grounding
-# with it, so this runs weekly as well as on pull requests.
+# Every factual claim in a skill is meant to be verifiable from a public surface,
+# and the links are what make that checkable, so link rot costs more than a broken
+# anchor. `task links` runs lychee through Docker, so this needs no setup beyond
+# task itself and a local run uses the same code path.
 
 on:
   pull_request:
@@ -24,17 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Check links
-        uses: lycheeverse/lychee-action@v2
+      - uses: arduino/setup-task@v3
         with:
-          args: >-
-            --no-progress
-            --max-retries 3
-            --retry-wait-time 5
-            --accept 200,206,429
-            --exclude-path node_modules
-            --exclude '^https://github\.com/layerai/skills/security/advisories/new$'
-            --exclude '^mailto:'
-            --exclude '^https://mcp\.app\.layer\.ai/mcp$'
-            './**/*.md'
-          fail: true
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: task links

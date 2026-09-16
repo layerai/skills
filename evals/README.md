@@ -1,6 +1,6 @@
 # Evals
 
-Mechanical validation (`pnpm validate`) checks that a skill is well formed. It cannot tell you
+Mechanical validation (`task check`) checks that a skill is well formed. It cannot tell you
 whether the skill teaches. That is what the application test does, and it is the gate a new or
 changed skill has to pass before merging.
 
@@ -14,8 +14,8 @@ the public tool reference fetched fresh.
 Generate the prompt:
 
 ```bash
-node scripts/application-test.mjs layer-pixel-art \
-  "We need a 32x32 walk cycle for our knight sprite, four frames, packed into one sheet."
+task test:app NAME=layer-pixel-art \
+  TASK="We need a 32x32 walk cycle for our knight sprite, four frames, packed into one sheet."
 ```
 
 Paste the output into a fresh agent session with no history. Grade the returned plan. Any of these

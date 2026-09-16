@@ -42,6 +42,7 @@ scrim
 settleable
 SNES
 spritesheet
+Taskfile
 tileability
 tileable
 tileset

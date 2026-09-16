@@ -1,11 +1,11 @@
 name: Tool drift
 
-# Verifies every Layer MCP tool the skills name still exists in the public manifest.
+# Checks every Layer MCP tool the skills name still exists in the public manifest.
 #
-# This runs on a schedule as well as on pull requests because the failure mode is
-# one-sided: the manifest changes when Layer ships, this repository does not, and a
-# renamed or removed tool silently turns a correct skill into one that teaches an
-# agent to invent a call. A pull-request-only check would never see it.
+# Scheduled as well as per pull request because the failure is one-sided: the
+# manifest changes when Layer ships, this repository does not, and a renamed tool
+# silently turns a correct skill into one that teaches an agent to invent a call.
+# A pull-request-only check would never see it.
 
 on:
   push:
@@ -29,14 +29,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           # The check uses only node built-ins and fetch, so no install runs here.
           # Left on, setup-node reads packageManager, looks for pnpm, and fails.
           package-manager-cache: false
-      - name: Check tool references against the public manifest
-        run: node ./scripts/check-tool-references.mjs
+      - run: task tools:check
 
   # A scheduled failure has no pull request to report on, so file it where someone
   # will see it. Only on the schedule: a pull-request failure is already visible.

@@ -130,9 +130,11 @@ rules, the description format, the word budget, the ban on hard-coded model ids,
 test every new skill has to pass. [CONTRIBUTING.md](CONTRIBUTING.md) covers the mechanics.
 
 ```bash
-pnpm install
-pnpm format && pnpm validate
+task install
+task format && task check
 ```
+
+`task --list` shows every available command.
 
 ## License
 

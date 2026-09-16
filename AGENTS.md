@@ -43,7 +43,7 @@ tests/<name>/                # tests for any script shipped with skill <name>
 Supporting files sit next to a SKILL.md only when the content is too large to inline, and must be
 linked directly from SKILL.md: agents resolve file references one level deep, so a reference chained
 through another supporting file may never be read. A skill's own `README.md` is the one exemption
-(`pnpm skill-files` skips it): it documents the skill for maintainers, not for the agent running it,
+(`task skill-files` skips it): it documents the skill for maintainers, not for the agent running it,
 and linking it would spend body words inviting a runtime agent to read maintainer notes as
 instructions.
 
@@ -75,8 +75,8 @@ description never fires.
 
 ### Body
 
-- 1000 words is the house target. The build fails past 2500 (`pnpm style`).
-- Measure the exact number `pnpm style` checks:
+- 1000 words is the house target. The build fails past 2500 (`task style`).
+- Measure the exact number `task style` checks (`task words` prints it per skill):
   `awk '/^---$/{c++; next} c>=2' skills/<name>/SKILL.md | wc -w`
 - Structure: Overview, Quick reference, one excellent worked example, Common mistakes.
 - Why a budget at all: the body enters context only when the skill triggers, and then every word
@@ -179,36 +179,48 @@ for a machine.
 
 ## Tooling
 
-One-time setup: `pnpm install`, which installs prettier, cspell, commitlint, and the husky hooks.
+One-time setup: `task install`. It needs [Task](https://taskfile.dev) and, for spec validation,
+[uv](https://docs.astral.sh/uv/), and it installs prettier, cspell, commitlint, and the husky hooks.
 
-`pnpm validate` is the gate, run identically by the pre-commit hook and by CI:
+Commands live in the `Taskfile.yaml`, not in workflow YAML: CI is setup plus one task call per job,
+so the same command runs locally and in CI. `task --list` shows them all. The pnpm scripts in
+`package.json` are the thin layer underneath; a task calls a script, never the other way round.
 
-| Script                | Checks                                                                      |
-| --------------------- | --------------------------------------------------------------------------- |
-| `pnpm style`          | Body word budget, em dashes, frontmatter contract, house style              |
-| `pnpm format:check`   | prettier                                                                    |
-| `pnpm skill-files`    | Supporting files are linked from SKILL.md and parse; `README.md` exempt     |
-| `pnpm groupings`      | Every skill is in a `skills.sh.json` grouping and every listed skill exists |
-| `pnpm manifest:check` | Plugin manifests match `skills.sh.json` and `VERSION`                       |
-| `pnpm readme`         | The README skills table mirrors `skills.sh.json`                            |
-| `pnpm spell`          | cspell                                                                      |
-| `pnpm spec`           | `skills-ref validate` on every skill                                        |
+`task check` is the gate, run identically by the pre-commit hook and by the Validate workflow:
 
-`pnpm tools:check` is deliberately outside that chain. It verifies every MCP tool a skill names
-against the public manifest, which needs network, and the pre-commit hook has to work offline. CI
-runs it on every pull request and daily on a schedule, because the manifest changes when Layer ships
-and this repository does not: a renamed tool turns a correct skill into one that teaches an agent to
-invent a call, and only a scheduled check sees that.
+| Task                 | Checks                                                                      |
+| -------------------- | --------------------------------------------------------------------------- |
+| `task style`         | Body word budget, em dashes, frontmatter contract, house style              |
+| `task format:check`  | prettier                                                                    |
+| `task skill-files`   | Supporting files are linked from SKILL.md and parse; `README.md` exempt     |
+| `task groupings`     | Every skill is in a `skills.sh.json` grouping and every listed skill exists |
+| `task version:check` | `VERSION` agrees with every plugin manifest that declares one               |
+| `task spell`         | cspell                                                                      |
+| `task spec`          | `skills-ref validate` on every skill                                        |
+| `task json`          | The plugin manifests and MCP configs are valid JSON                         |
 
-Run `pnpm format` before `pnpm validate` after writing markdown: prettier reflows prose and rewrites
+Two checks sit outside `task check` because they need the network, and the pre-commit hook has to
+work offline. Each is its own CI job:
+
+- `task tools:check` verifies every MCP tool a skill names against the public manifest. It runs per
+  pull request and daily, because the manifest changes when Layer ships and this repository does
+  not: a renamed tool turns a correct skill into one that teaches an agent to invent a call, and
+  only a scheduled check sees that.
+- `task links` checks every link resolves, through Docker so CI and a local run share one code path.
+
+Run `task format` before `task check` after writing markdown: prettier reflows prose and rewrites
 tables, so `format:check` rejects correct hand-written markdown.
 
-`skills.sh.json` is the single source of truth for grouping. `.claude-plugin/marketplace.json` and
-the README skills table are generated from it (`pnpm manifest`, `pnpm readme --fix`); never edit
-either by hand.
+`skills.sh.json` is the single source of truth for grouping. `.claude-plugin/marketplace.json`, the
+other plugin manifests, and the README skills table are generated from it (`task manifest`); never
+edit any of them by hand.
+
+Authoring helpers: `task new NAME=layer-something` writes a skeleton, `task words` prints the body
+word count the budget is enforced against, and `task test:app` prints the application test prompt.
+`task version:set VERSION=x.y.z` bumps the version and regenerates every manifest that declares it.
 
 Conventional Commits, enforced by commitlint. Valid scopes are the skill directory names plus
-`skills`, `ci`, `deps`, `docs`, and `tooling`.
+`skills`, `ci`, `deps`, `docs`, `tooling`, and `evals`.
 
 ## Validation and testing
 

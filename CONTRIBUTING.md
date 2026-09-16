@@ -19,11 +19,12 @@ Thanks for helping improve the Layer Agent Skills. This guide covers the mechani
 ```bash
 git clone https://github.com/layerai/skills.git
 cd skills
-pnpm install
+task install
 ```
 
-`pnpm install` sets up prettier, cspell, commitlint, and the husky hooks, so every commit runs the
-checks CI runs.
+Needs [Task](https://taskfile.dev) and [uv](https://docs.astral.sh/uv/); `task install` does the
+rest, including the husky hooks, so every commit runs the checks CI runs. `task --list` shows
+everything available.
 
 ## Authoring a skill
 
@@ -37,18 +38,32 @@ be verifiable from a public surface.** Anything else is a guess, even when it ha
 ## Validating
 
 ```bash
-pnpm format   # prettier reflows prose, so run it before validate
-pnpm validate # style, formatting, supporting files, groupings, manifests, README, spelling, spec
+task format # prettier reflows prose, so run it before check
+task check  # style, formatting, supporting files, groupings, manifests, README, spelling, spec
+```
+
+Two checks sit outside `task check` because they need the network, and CI runs each as its own job:
+
+```bash
+task tools:check # every MCP tool a skill names still exists in the public manifest
+task links       # every link in the markdown resolves (runs lychee through Docker)
 ```
 
 `skills.sh.json` is the source of truth for grouping. The plugin manifests and the README skills
-table are generated from it, so never edit those by hand; `pnpm manifest` and `pnpm readme:fix`
-regenerate them, and the pre-commit hook does it for you.
+table are generated from it, so never edit those by hand; `task manifest` regenerates both, and the
+pre-commit hook does it for you.
+
+Starting a skill: `task new NAME=layer-something` writes the skeleton, then add it to a grouping in
+`skills.sh.json`. `task words` prints the body word count the budget is enforced against.
 
 A new or changed skill also needs the application test from
 [AGENTS.md](AGENTS.md#application-test-protocol): a clean-room agent runs a realistic task with only
 the skill installed, and its plan is graded against the public tool reference. Mechanical validation
 checks the format. The application test checks whether the skill actually teaches.
+
+```bash
+task test:app NAME=layer-pixel-art TASK="A 32x32 four-frame walk cycle, packed into one sheet."
+```
 
 ## Commits and pull requests
 

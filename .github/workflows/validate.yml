@@ -1,5 +1,8 @@
 name: Validate
 
+# The checking logic lives in the Taskfile, so this workflow is setup plus one
+# task call. `task check` is the same command the pre-commit hook runs.
+
 on:
   push:
     branches: [main]
@@ -14,41 +17,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
+      # `task spec` runs the Agent Skills reference validator through uvx.
       - uses: astral-sh/setup-uv@v7
         with:
           enable-cache: false
-      - name: Install
-        run: pnpm install --frozen-lockfile
-      - name: House style and word budget
-        run: pnpm style
-      - name: Formatting
-        run: pnpm format:check
-      - name: Supporting files
-        run: pnpm skill-files
-      - name: Groupings
-        run: pnpm groupings
-      - name: Plugin manifests
-        run: pnpm manifest:check
-      - name: README skills table
-        run: pnpm readme
-      - name: Version sync
-        run: pnpm version:check
-      - name: Spelling
-        run: pnpm spell
-      - name: Spec validation
-        run: pnpm spec
-      - name: Plugin JSON is valid
-        run: |
-          for f in .claude-plugin/*.json .cursor-plugin/*.json .codex-plugin/*.json mcp.json .mcp.json; do
-            jq -e . "$f" > /dev/null || { echo "::error::Invalid JSON: $f"; exit 1; }
-            echo "OK $f"
-          done
+      - run: task check

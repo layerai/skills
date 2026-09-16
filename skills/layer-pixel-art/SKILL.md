@@ -53,7 +53,15 @@ The working sequence:
    and describe only what changed: "same character, same palette, same 32x32 grid, left leg forward
    mid-stride, right arm back."
 3. Review the frames as a set and reroll the ones that drifted.
-4. `pack_sprite_sheet` to assemble them into a uniform-cell sheet.
+4. `pack_sprite_sheet` to assemble them into a uniform-cell sheet. Its input schema is the
+   authority on the argument shape, so read it rather than assuming the parameter name.
+
+Every frame after the first references **frame one**, not the frame before it. Chaining each frame
+off the last one compounds drift, so by frame four the knight is a different knight.
+
+When a trained pixel style is in play, attach it as `reference_sets` and omit `base_model_id`
+entirely, so the server picks a model that can apply it. Use the same set, the same weight, and the
+same reference frame on every frame of the cycle.
 
 A four-frame cycle (contact, down, passing, up) reads as motion and is far more reliable than eight.
 Start there and add frames only if the motion needs them.

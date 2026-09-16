@@ -60,6 +60,11 @@ balance, and which model the run would use including whether it was `auto_picked
 states that it is not negotiable, so do not raise it and do not let a user raise it for the session.
 Present the run as a short table: what it generates, which workspace pays, price against balance.
 
+The gate is per run, since each estimate prices one run. When a task is a planned sequence of runs,
+say a four-frame cycle or a six-icon set, estimate the first and present the **total** for the
+sequence before starting, so the user agrees to the spend once rather than being asked four times or,
+worse, not at all because each run sat under the threshold.
+
 Some workspaces carry `allow_negative_balance`. That means the run will not be blocked. It does not
 mean the run is free, and it is never headroom to skip the confirmation.
 

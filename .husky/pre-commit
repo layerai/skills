@@ -1,0 +1,7 @@
+# Regenerate what skills.sh.json is the source of truth for, then run the same
+# gate CI runs. Logic lives in the Taskfile, not here.
+task manifest
+git diff --cached --quiet -- .claude-plugin .cursor-plugin .codex-plugin README.md || {
+  git add -u .claude-plugin .cursor-plugin .codex-plugin README.md 2> /dev/null || true
+}
+task check

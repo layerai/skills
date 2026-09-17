@@ -1,0 +1,37 @@
+{
+  "name": "@layerai/skills",
+  "private": true,
+  "type": "module",
+  "description": "Public Agent Skills for Layer: creative craft for AI asset generation.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/layerai/skills.git"
+  },
+  "license": "MIT",
+  "packageManager": "pnpm@10.18.0",
+  "scripts": {
+    "prepare": "husky",
+    "validate": "pnpm style && pnpm format:check && pnpm skill-files && pnpm groupings && pnpm manifest:check && pnpm readme && pnpm version:check && pnpm spell && pnpm spec",
+    "style": "node ./scripts/check-style.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "skill-files": "./scripts/check-skill-files.sh",
+    "groupings": "node ./scripts/check-groupings.mjs",
+    "manifest": "node ./scripts/generate-plugin-manifest.mjs",
+    "manifest:check": "node ./scripts/generate-plugin-manifest.mjs --check",
+    "readme": "node ./scripts/check-readme.mjs",
+    "readme:fix": "node ./scripts/check-readme.mjs --fix",
+    "version:check": "node ./scripts/check-version-sync.mjs",
+    "spell": "cspell --no-progress --no-summary \"**/*.md\" \"**/*.json\"",
+    "spec": "./scripts/validate-skills.sh",
+    "tools:check": "node ./scripts/check-tool-references.mjs"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "cspell": "^10.0.1",
+    "husky": "^9.1.7",
+    "prettier": "^3.9.6",
+    "prettier-plugin-sh": "^0.19.0"
+  }
+}

@@ -1,0 +1,31 @@
+name: Links
+
+# Every factual claim in a skill is meant to be verifiable from a public surface,
+# and the links are what make that checkable, so link rot costs more than a broken
+# anchor. `task links` runs lychee through Docker, so this needs no setup beyond
+# task itself and a local run uses the same code path.
+
+on:
+  pull_request:
+    branches: [main]
+  schedule:
+    # 08:00 UTC on Mondays.
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: links-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - run: task links

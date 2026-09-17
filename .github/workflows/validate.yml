@@ -1,0 +1,36 @@
+name: Validate
+
+# The checking logic lives in the Taskfile, so this workflow is setup plus one
+# task call. `task check` is the same command the pre-commit hook runs.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      # `task spec` runs the Agent Skills reference validator through uvx.
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
+      - run: task check

@@ -1,0 +1,67 @@
+{
+  "name": "layer",
+  "owner": { "name": "Layer", "url": "https://layer.ai" },
+  "description": "Layer skills: creative craft for AI game and entertainment asset generation.",
+  "plugins": [
+    {
+      "name": "01.-getting-started",
+      "source": "./",
+      "description": "Connect to Layer and learn the generation loop every other skill builds on: model discovery, the spend gate, uploads, and polling.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer"]
+    },
+    {
+      "name": "02.-direction",
+      "source": "./",
+      "description": "Agree a look before generating at volume: moodboards, storyboards, colour, era, and framing.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-art-direction"]
+    },
+    {
+      "name": "03.-images",
+      "source": "./",
+      "description": "Generate stills and change the ones you already have: prompting, sizing, references, masked edits, reframing, upscaling, and layers.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-image", "./skills/layer-image-editing"]
+    },
+    {
+      "name": "04.-game-art",
+      "source": "./",
+      "description": "Art that has to sit in a system: characters and casts, environments and parallax, game UI, pixel sprites and sheets, and seamless textures.",
+      "version": "0.1.0",
+      "skills": [
+        "./skills/layer-game-assets",
+        "./skills/layer-pixel-art",
+        "./skills/layer-textures"
+      ]
+    },
+    {
+      "name": "05.-video-and-audio",
+      "source": "./",
+      "description": "Motion and sound: animating stills, camera and loops, sound effects, music, speech, and cutting shots into one finished video.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-video", "./skills/layer-audio", "./skills/layer-video-timeline"]
+    },
+    {
+      "name": "06.-3d",
+      "source": "./",
+      "description": "Meshes for a game engine: generation from text or image, remeshing, retexturing, rigging, and animation.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-3d"]
+    },
+    {
+      "name": "07.-consistency-and-pipelines",
+      "source": "./",
+      "description": "Hold one look across a whole project with trained reference sets, and run the Blueprint workflows a studio has already built.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-reference-sets", "./skills/layer-workflows"]
+    },
+    {
+      "name": "08.-review",
+      "source": "./",
+      "description": "Judge a batch before it ships: scoring rules, verdicts, and reviewing a set against the brief.",
+      "version": "0.1.0",
+      "skills": ["./skills/layer-quality"]
+    }
+  ]
+}

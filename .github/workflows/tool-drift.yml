@@ -1,0 +1,70 @@
+name: Tool drift
+
+# Checks every Layer MCP tool the skills name still exists in the public manifest.
+#
+# Scheduled as well as per pull request because the failure is one-sided: the
+# manifest changes when Layer ships, this repository does not, and a renamed tool
+# silently turns a correct skill into one that teaches an agent to invent a call.
+# A pull-request-only check would never see it.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # 07:00 UTC daily.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tool-drift-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tool-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          # The check uses only node built-ins and fetch, so no install runs here.
+          # Left on, setup-node reads packageManager, looks for pnpm, and fails.
+          package-manager-cache: false
+      - run: task tools:check
+
+  # A scheduled failure has no pull request to report on, so file it where someone
+  # will see it. Only on the schedule: a pull-request failure is already visible.
+  report:
+    needs: tool-drift
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@v5
+      - name: Open or update a drift issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Tool drift: a skill names a tool the public manifest no longer publishes"
+          existing=$(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number')
+          body="The scheduled tool-drift check failed, so at least one skill names an MCP tool that is no longer in https://layer.ai/.well-known/mcp.
+
+          Run: $RUN_URL
+
+          Fix the skill text to match the current tool surface. Do not add the name to the allowlist in \`scripts/check-tool-references.mjs\`: that list is for tokens which merely share the shape of a tool name, not for tools that went away."
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label "bug"
+          fi

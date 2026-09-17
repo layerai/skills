@@ -1,0 +1,280 @@
+# https://taskfile.dev
+#
+# Tasks for the public Layer Agent Skills repository.
+#
+# The checking, linting and generation logic lives here rather than in workflow
+# YAML, so CI is setup plus one task call per job and the same command runs
+# locally. `task check` is the gate; the pre-commit hook runs it too.
+#
+# pnpm scripts in package.json are the thin layer underneath: a task calls a
+# script, never the other way round.
+version: "3"
+
+vars:
+  # Where every factual claim in a skill has to be verifiable from.
+  TOOL_REFERENCE: https://layer.ai/docs/mcp/tools
+  MCP_MANIFEST: https://layer.ai/.well-known/mcp
+
+tasks:
+  # ── Setup ──
+
+  install:
+    desc: Install the pnpm workspace and the git hooks.
+    # pnpm defaults to --frozen-lockfile when CI=true, so a stale lockfile fails
+    # the required CI gates while local installs stay flexible.
+    cmds:
+      - pnpm install
+    sources:
+      - package.json
+      - pnpm-lock.yaml
+    generates:
+      - node_modules/.modules.yaml
+    silent: true
+
+  # ── Code quality ──
+  #
+  # `check` is the offline gate: it is what the pre-commit hook runs and what the
+  # Validate workflow calls. The two network checks (`tools:check`, `links`) are
+  # separate because the hook has to work offline, and because they fail for
+  # reasons a pull request did not cause.
+
+  check:
+    desc: Run every offline review check (the CI review action). What the pre-commit hook runs.
+    deps: [install]
+    cmds:
+      - task: validate
+      - task: json
+
+  validate:
+    desc: >-
+      House style and the body budget, formatting, supporting files, groupings,
+      the generated manifests and README, version sync, spelling, and spec
+      validation. Each step is also a task below.
+    deps: [install]
+    cmd: pnpm validate
+
+  style:
+    desc: Check the frontmatter contract, the body word budget, and house style.
+    deps: [install]
+    cmd: pnpm style
+
+  format:
+    desc: Format everything with prettier. Run this before `check` after writing markdown.
+    deps: [install]
+    cmd: pnpm format
+
+  format:check:
+    desc: Verify formatting without rewriting anything.
+    deps: [install]
+    cmd: pnpm format:check
+
+  skill-files:
+    desc: Check supporting files next to a SKILL.md are linked from it and parse.
+    deps: [install]
+    cmd: pnpm skill-files
+
+  groupings:
+    desc: Check every skill sits in exactly one skills.sh.json grouping.
+    deps: [install]
+    cmd: pnpm groupings
+
+  spell:
+    desc: Spell-check the repository (cspell). Add real project terms to project-words.txt.
+    deps: [install]
+    cmd: pnpm spell
+
+  spec:
+    desc: Validate every skill against the Agent Skills spec (skills-ref, needs uv).
+    deps: [install]
+    cmd: pnpm spec
+
+  version:check:
+    desc: Check VERSION agrees with every plugin manifest that declares one.
+    deps: [install]
+    cmd: pnpm version:check
+
+  json:
+    desc: Check the plugin manifests and MCP configs are valid JSON.
+    cmd: |
+      set -eu
+      for f in .claude-plugin/*.json .cursor-plugin/*.json .codex-plugin/*.json mcp.json .mcp.json; do
+        jq -e . "$f" > /dev/null || { echo "invalid JSON: $f" >&2; exit 1; }
+        echo "OK $f"
+      done
+
+  # ── Checks that need the network ──
+
+  tools:check:
+    desc: >-
+      Check every Layer MCP tool a skill names still exists in the public
+      manifest. Outside `check` because it needs the network and the pre-commit
+      hook has to work offline. CI runs it per pull request and daily: the
+      manifest changes when Layer ships and this repository does not, so a
+      renamed tool silently turns a correct skill into a wrong one.
+    # node directly, not through pnpm: the script uses only node built-ins and
+    # fetch, so its CI job needs no install and no package manager on the runner.
+    cmd: node ./scripts/check-tool-references.mjs
+
+  links:
+    desc: >-
+      Check every link in the markdown resolves. Runs lychee through Docker so
+      CI and a local run use one code path and neither needs it installed.
+    vars:
+      LYCHEE_IMAGE: lycheeverse/lychee:latest
+    cmd: |
+      set -eu
+      if ! command -v docker > /dev/null 2>&1; then
+        echo "links: docker not found; install Docker to run the link check locally" >&2
+        exit 1
+      fi
+      docker run --rm -v "$PWD:/input" --workdir /input {{.LYCHEE_IMAGE}} \
+        --no-progress \
+        --max-retries 3 \
+        --retry-wait-time 5 \
+        --accept 200,206,429 \
+        --exclude-path node_modules \
+        --exclude '^https://github\.com/layerai/skills/security/advisories/new$' \
+        --exclude '^mailto:' \
+        `# The MCP endpoint is OAuth-walled and answers 401. Excluded by name` \
+        `# rather than accepting 401 globally, which would mask real link rot.` \
+        --exclude '^https://mcp\.app\.layer\.ai/mcp$' \
+        './**/*.md'
+
+  # ── Commit and pull request hygiene ──
+
+  lint:pr-title:
+    desc: >-
+      Lint a pull request title against the commit rules, read from the PR_TITLE
+      environment variable. Pull requests squash-merge, so the title becomes the
+      commit header on main.
+    deps: [install]
+    # PR_TITLE is read from the environment rather than taken as a task variable
+    # on purpose: a pull request title is untrusted input, and a task variable is
+    # templated into the command before the shell ever sees it.
+    cmd: |
+      set -eu
+      if [ -z "${PR_TITLE:-}" ]; then
+        echo 'lint:pr-title: set PR_TITLE, e.g. PR_TITLE="feat(layer): ..." task lint:pr-title' >&2
+        exit 1
+      fi
+      printf '%s' "$PR_TITLE" | pnpm commitlint
+
+  lint:commits:
+    desc: Lint every commit message in a range (FROM, TO). Defaults to this branch against main.
+    deps: [install]
+    vars:
+      FROM: '{{default "origin/main" .FROM}}'
+      TO: '{{default "HEAD" .TO}}'
+    cmd: pnpm commitlint --from "{{.FROM}}" --to "{{.TO}}"
+
+  # ── Authoring a skill ──
+
+  new:
+    desc: >-
+      Scaffold a new skill (NAME). Writes the SKILL.md skeleton only: add it to a
+      skills.sh.json grouping yourself, which is what `task groupings` checks and
+      what generates the manifests and the README row.
+    requires:
+      vars: [NAME]
+    status:
+      - test -f skills/{{.NAME}}/SKILL.md
+    cmds:
+      - mkdir -p skills/{{.NAME}}
+      - |
+        cat > skills/{{.NAME}}/SKILL.md <<'EOF'
+        ---
+        name: {{.NAME}}
+        description: "Use when TODO: triggering conditions only, never a summary of the workflow. Under 500 characters. Rich in the words a user actually types. Keywords: TODO."
+        license: MIT
+        ---
+
+        # TODO Title
+
+        ## Overview
+
+        TODO. What this covers, and what the reader should use instead when it is the wrong skill.
+        The generation loop and the spend gate live in the `layer` skill; cross-reference rather
+        than restate.
+
+        If a sibling skill named here is missing from your available skills, ask the user to install
+        it (`npx skills add layerai/skills --skill <name>`); unattended, proceed from tool schemas
+        and flag the gap.
+
+        ## Quick reference
+
+        TODO.
+
+        ## Worked example
+
+        TODO. One example, carried all the way through.
+
+        ## Common mistakes
+
+        - TODO.
+        EOF
+      - echo "created skills/{{.NAME}}/SKILL.md"
+      - echo "next add {{.NAME}} to a grouping in skills.sh.json, then run task manifest"
+
+  words:
+    desc: >-
+      Print the body word count for each skill, or one skill (NAME). This is the
+      exact measurement the budget in AGENTS.md is enforced against.
+    cmds:
+      - |
+        set -eu
+        for f in skills/{{default "*" .NAME}}/SKILL.md; do
+          # awk sums the words itself rather than piping to `wc -w`: wc pads its
+          # output, and printf %d reads a space-padded value as 0. Same count as
+          # the `awk ... | wc -w` measurement AGENTS.md documents.
+          printf '%6d  %s\n' "$(awk '/^---$/{c++; next} c>=2{n+=NF} END{print n+0}' "$f")" "$f"
+        done
+
+  test:app:
+    desc: >-
+      Print the clean-room application test prompt for a skill (NAME, TASK).
+      Paste it into a fresh agent with no history and no repository context, then
+      grade the plan it returns against the public tool reference. The protocol
+      and the fail conditions are in AGENTS.md.
+    requires:
+      vars: [NAME, TASK]
+    cmds:
+      - node ./scripts/application-test.mjs {{.NAME}} "{{.TASK}}"
+      - echo "" >&2
+      - echo "grade the returned plan against {{.TOOL_REFERENCE}} and {{.MCP_MANIFEST}}, fetched fresh" >&2
+
+  # ── Generated files ──
+  #
+  # skills.sh.json is the single source of truth. The plugin manifests and the
+  # README skills table are generated from it, so neither is ever hand-edited.
+  # The pre-commit hook regenerates both.
+
+  manifest:
+    desc: Regenerate the plugin manifests and the README skills table from skills.sh.json.
+    deps: [install]
+    cmds:
+      - pnpm manifest
+      - pnpm readme:fix
+
+  # ── Release ──
+
+  version:set:
+    desc: Set the repository version (VERSION) and regenerate every manifest that declares it.
+    deps: [install]
+    requires:
+      vars: [VERSION]
+    cmds:
+      - |
+        echo "{{.VERSION}}" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' || {
+          echo "version:set: VERSION must be semver, got '{{.VERSION}}'" >&2
+          exit 1
+        }
+      - echo "{{.VERSION}}" > VERSION
+      - task: manifest
+      - task: version:check
+      - echo "version set to {{.VERSION}}"
+
+  # ── Housekeeping ──
+
+  clean:
+    desc: Remove installed dependencies.
+    cmd: rm -rf node_modules

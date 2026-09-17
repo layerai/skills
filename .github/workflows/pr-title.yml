@@ -1,0 +1,52 @@
+name: PR title
+
+# Pull requests are squash-merged, so the title becomes the commit header on main.
+# It is linted with the same rules as a commit message, including the scope list
+# derived from skills/.
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-title-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lint-title:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      # Passed through the environment, never interpolated into the command: a
+      # pull request title is untrusted input.
+      - run: task lint:pr-title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+
+  lint-commits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: task lint:commits FROM=${{ github.event.pull_request.base.sha }} TO=${{ github.event.pull_request.head.sha }}

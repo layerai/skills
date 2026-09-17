@@ -1,0 +1,39 @@
+{
+  "name": "layer",
+  "displayName": "Layer",
+  "version": "0.1.0",
+  "description": "Generate game and entertainment assets with Layer: images, video, 3D, and audio, with the craft knowledge to direct them.",
+  "author": { "name": "Layer", "url": "https://layer.ai" },
+  "homepage": "https://layer.ai",
+  "repository": "https://github.com/layerai/skills",
+  "license": "MIT",
+  "skills": [
+    "./skills/layer",
+    "./skills/layer-art-direction",
+    "./skills/layer-image",
+    "./skills/layer-image-editing",
+    "./skills/layer-game-assets",
+    "./skills/layer-pixel-art",
+    "./skills/layer-textures",
+    "./skills/layer-video",
+    "./skills/layer-audio",
+    "./skills/layer-video-timeline",
+    "./skills/layer-3d",
+    "./skills/layer-reference-sets",
+    "./skills/layer-workflows",
+    "./skills/layer-quality"
+  ],
+  "keywords": [
+    "layer",
+    "game-assets",
+    "image-generation",
+    "video-generation",
+    "3d",
+    "audio",
+    "pixel-art",
+    "sprites",
+    "textures",
+    "lora",
+    "mcp"
+  ]
+}

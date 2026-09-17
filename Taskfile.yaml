@@ -111,7 +111,9 @@ tasks:
       hook has to work offline. CI runs it per pull request and daily: the
       manifest changes when Layer ships and this repository does not, so a
       renamed tool silently turns a correct skill into a wrong one.
-    cmd: pnpm tools:check
+    # node directly, not through pnpm: the script uses only node built-ins and
+    # fetch, so its CI job needs no install and no package manager on the runner.
+    cmd: node ./scripts/check-tool-references.mjs
 
   links:
     desc: >-

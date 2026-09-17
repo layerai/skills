@@ -78,7 +78,8 @@ those are more reliable than describing the motion in prose.
 "Turn this approved prop concept into a game-ready mesh for mobile."
 
 1. The concept exists from an earlier image run and already carries a `file_id`.
-2. `list_base_models` with `filter.use_case: "image_to_3d"` and `filter.capabilities: ["textures"]`.
+2. `list_base_models` with `filter.use_case: "image_to_3d"` and
+   `filter.capabilities: {textures: true}` (an object of booleans, not a list of names).
    Take the first result, then `get_base_model` for the fields it accepts.
 3. `estimate_forge_price` with the concept as `image_to_3d` input, `pbr_materials` and
    `include_textures` on, `quad_mesh` off for a static prop, and a `face_limit` matched to mobile. 3D

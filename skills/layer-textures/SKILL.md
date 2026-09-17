@@ -13,8 +13,9 @@ and whose top continues into its bottom, so that a plane tiled with it shows no 
 not do this unless the run asks for it.
 
 The mandatory step is the capability filter: `list_base_models` with
-`filter.capabilities: ["tileability"]`. A model without it produces a picture of stone that seams
-visibly the moment it repeats, and no editing pass fixes that afterwards. Everything else on this
+`filter.capabilities: {tileability: true}`. Note the shape: `capabilities` is an object of booleans,
+not a list of names. A model without it produces a picture of stone that seams visibly the moment it
+repeats, and no editing pass fixes that afterwards. Everything else on this
 page is secondary to getting that filter right.
 
 Generation mechanics are in the `layer` skill. If a sibling skill named here is missing from your
@@ -69,8 +70,8 @@ Pixel-art tiles carry these rules plus their own: see `layer-pixel-art`.
 "A seamless mossy stone floor for our dungeon."
 
 1. `list_base_models` with `filter.use_case: "text_to_image"` and
-   `filter.capabilities: ["tileability", "square"]`. Take the first result. Without `tileability`
-   this run is wasted.
+   `filter.capabilities: {tileability: true, square: true}`. Take the first result. Without
+   `tileability` this run is wasted.
 2. `get_base_model`, to see whether it exposes a tiling parameter that must also be set, and what
    material outputs it offers.
 3. Prompt: "Seamless tileable texture of worn dungeon flagstones with moss in the joints, covering

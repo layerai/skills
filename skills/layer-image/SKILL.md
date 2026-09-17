@@ -46,8 +46,10 @@ Aspect ratio and resolution are per-model contracts. Two models that both do tex
 about whether they take an aspect ratio string, explicit width and height, or a fixed set of named
 sizes, so read `get_base_model` rather than reusing the shape that worked last time.
 
-When the deliverable has a fixed ratio, filter for it: `square`, `portrait_9_16`, `landscape_16_9`,
-or `multiple_aspect_ratios` when the user will want several crops from one setup.
+When the deliverable has a fixed ratio, filter for it. `filter.capabilities` is an object of
+booleans, not a list of names, so it is `{portrait_9_16: true}`: `square`, `portrait_9_16`,
+`landscape_16_9`, or `multiple_aspect_ratios` when the user will want several crops from one setup.
+Set only what the task needs, since `false` filters rather than defaults.
 
 ## Negatives, references, and seeds
 
@@ -58,7 +60,10 @@ recurring defect.
 
 Three reference types steer a text-to-image run, all passed through `guidance_files` after an upload:
 
-- `reference_image` with the `style_reference` capability, for "make it look like this".
+- `reference_image` with the `image_editing` capability, for "reproduce this subject" and for new
+  art that has to match a reference. `style_reference` is the older style-only transfer: it moves a
+  look across, it does not carry a subject, so reaching for it to hold a character is the usual
+  reason a cast drifts.
 - `pose` with `character_pose`, for "put the character in this position".
 - `depth`, `canny`, `lineart`, or `scribble` with `structure` or `outline`, for "keep this layout".
 
@@ -81,7 +86,7 @@ also what makes it editable and localisable later.
 "Key art for our roguelike, 16:9, for the Steam page."
 
 1. `list_base_models` with `filter.use_case: "text_to_image"` and
-   `filter.capabilities: ["landscape_16_9"]`. Take the first result.
+   `filter.capabilities: {landscape_16_9: true}`. Take the first result.
 2. `get_base_model`, which reports the sizing fields it accepts and whether it needs a trigger word.
 3. Compose against the six points above: "Hooded rogue mid-leap over a collapsing stone bridge, seen
    three-quarter from below, hand-painted semi-realism, hard moonlight from the upper left with cold

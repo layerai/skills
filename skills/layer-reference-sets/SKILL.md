@@ -25,13 +25,13 @@ gap.
 
 Training costs Creative Units and takes time. It is the right answer less often than people expect.
 
-| Situation                                   | Do this                                                                             |
-| ------------------------------------------- | ----------------------------------------------------------------------------------- |
-| A handful of assets, this week              | Attach an approved image as `reference_image` with the `style_reference` capability |
-| One character across a dozen images         | Style reference from an approved hero image usually suffices                        |
-| A look reused for months, by several people | Train a reference set                                                               |
-| A cast or prop library that keeps growing   | Train, one set per subject                                                          |
-| The style exists only in the user's head    | Generate first, approve, then train on the output                                   |
+| Situation                                   | Do this                                                                      |
+| ------------------------------------------- | ---------------------------------------------------------------------------- |
+| A handful of assets, this week              | Attach an approved image as `reference_image`, filtering for `image_editing` |
+| One character across a dozen images         | An approved hero image as a reference usually suffices                       |
+| A look reused for months, by several people | Train a reference set                                                        |
+| A cast or prop library that keeps growing   | Train, one set per subject                                                   |
+| The style exists only in the user's head    | Generate first, approve, then train on the output                            |
 
 The last row matters. A reference set can be trained on approved generations, not only on hand-made
 art, which is how a direction discovered in a session becomes reusable.
@@ -93,10 +93,11 @@ server picks a compatible model, or pick another one. Never describe a degraded 
    aesthetic rather than one subject.
 3. `estimate_training_price`, present it against the balance, and confirm above 20 CUs.
 4. `start_training`, then `get_training_status` at the returned interval until terminal success.
-5. First generation: `execute_forge` with `reference_sets: [{set_id, weight: 1.0}]` and **no**
-   `base_model_id`, so the server picks a model that can apply the LoRA.
-6. Check `reference_sets_degraded` on the estimate before executing, then judge the output and adjust
-   weight from there.
+5. `estimate_forge_price` with `reference_sets: [{set_id, weight: 1.0}]` and **no** `base_model_id`,
+   so the server picks a model that can apply the LoRA. The estimate carries the contribution report,
+   so check `reference_sets_degraded` here, before any spend.
+6. `execute_forge` with the same arguments once the estimate is clean and, above 20 CUs, confirmed.
+7. Poll `get_forge_run`, then judge the output and adjust weight from there.
 
 ## Common mistakes
 

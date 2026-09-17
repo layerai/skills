@@ -45,11 +45,14 @@ works here fails elsewhere with `MODEL_NOT_FOUND`. Discover it every time.
 `image_to_3d`, `remesh`, `retexture`, `rig`, `animate`, `segment`, `text_to_speech`, `sound_effects`,
 `music`.
 
-Narrow with `filter.capabilities` only for something the task genuinely requires: `tileability`,
-`inpainting`, `outpainting`, `negative_prompt`, `generate_audio`, `lipsync`, `style_reference`,
-`character_pose`, `structure`, `outline`, `multiple_aspect_ratios`. Bound spend with
-`filter.max_price`. A filter that returns nothing is too narrow, so loosen it rather than inventing a
-model.
+Narrow with `filter.capabilities` only for something the task genuinely requires. It is an **object
+of booleans, not a list of names**: `filter.capabilities: {tileability: true}`. Set only the ones you
+need and omit the rest, because `false` is a filter too, not a default. The fields include
+`tileability`, `inpainting`, `outpainting`, `negative_prompt`, `image_editing`, `generate_audio`,
+`lipsync`, `loop`, `fixed_duration`, `music`, `instrumental`, `sound_effect`, `character_pose`,
+`structure`, `outline`, `square`, `portrait_9_16`, `landscape_16_9`, and `multiple_aspect_ratios`.
+Bound spend with `filter.max_price`. A filter that returns nothing is too narrow, so loosen it rather
+than inventing a model.
 
 ## Spending Creative Units
 

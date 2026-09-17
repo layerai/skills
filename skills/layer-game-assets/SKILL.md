@@ -34,7 +34,9 @@ A cast is the hard part. Writing the same adjectives twice does not produce the 
 seeds do not carry across prompts. Two things work:
 
 1. **Anchor image.** Approve one hero image, then drive every sibling with it attached as
-   `reference_image` under the `style_reference` capability.
+   `reference_image`, filtering for `image_editing`, which is the capability for art that must
+   reproduce a provided subject. `style_reference` transfers a look only and will not keep the
+   character, which is the usual reason an anchored cast still drifts.
 2. **Trained style.** For a cast that will grow over weeks, train a reference set on approved art and
    apply it to every run. See `layer-reference-sets`.
 
@@ -83,7 +85,8 @@ as style references so the new one inherits the grammar rather than reinventing 
 
 1. The two approved icons already have `file_id` values from their original runs.
 2. `list_base_models` with `filter.use_case: "text_to_image"` and
-   `filter.capabilities: ["style_reference", "square"]`. Take the first result.
+   `filter.capabilities: {image_editing: true, square: true}` (an object of booleans, not a list of
+   names). Take the first result.
 3. One run per icon, six runs. Each attaches both approved icons as `reference_image`, and each
    prompt names the shared grammar plus the one new subject: "Ability icon, 64px target, flat
    three-quarter view, heavy uniform outline, two-tone fill, muted gold and slate palette, isolated

@@ -15,8 +15,8 @@ standards as output scoring rules, and exposes three tools:
 | Tool                        | Purpose                                                  |
 | --------------------------- | -------------------------------------------------------- |
 | `list_output_scoring_rules` | The rules in force for a workspace, optionally a project |
-| `score_files`               | Score files against those rules                          |
-| `get_file_scores`           | Read the verdicts already recorded on one file           |
+| `score_files`               | Queue a scoring run. Asynchronous and billed             |
+| `get_file_scores`           | Read the verdicts recorded on one file                   |
 
 Generation mechanics are in the `layer` skill. If a sibling skill named here is missing from your
 available skills, ask the user to install it (`npx skills add layerai/skills --skill <name>`);
@@ -28,8 +28,18 @@ Call `list_output_scoring_rules` before judging anything by eye. Each rule is a 
 has written down, and a delivery that contradicts one is wrong however good it looks. Rules can be
 scoped to a project as well as a workspace, so pass the project when the work belongs to one.
 
-When rules exist, `score_files` on the batch gives verdicts, and `get_file_scores` reads back what
-has already been recorded, which avoids re-scoring assets that were judged in an earlier session.
+When rules exist, `score_files` queues the batch and `get_file_scores` reads the verdicts back.
+
+Three things about that contract are easy to get wrong and expensive to get wrong:
+
+- **`score_files` is asynchronous.** It returns as soon as the run is queued, not with results. Poll
+  `get_file_scores` afterwards; a large request takes a few minutes.
+- **An empty `scores` list means not judged yet, not a zero.** Treating the queue acknowledgement as
+  a verdict, or an empty list as a failing score, is the defect this contract invites.
+- **It is billed, and there is no estimate tool for it.** Every file and rule pair is a vision-model
+  call that spends Creative Units, and none of the `estimate_*` tools price it. Scoring the same file
+  again is allowed and appends a fresh verdict rather than replacing the old one, so a re-score
+  because the first call "returned nothing" is a real double spend. Read `get_file_scores` first.
 
 When no rules exist, say so rather than implying the output passed a gate it never met, then review
 against the brief.
@@ -73,18 +83,26 @@ work already built on the flawed asset.
 
 1. `list_output_scoring_rules` for the workspace and the project. Two rules exist: transparent
    background, and a minimum legibility standard.
-2. `score_files` on the eight `file_id` values, which returns a verdict per rule per file.
-3. Two fail the transparency rule. Those are not judgement calls, so they go back through
+2. `get_file_scores` on the eight `file_id` values first, in case an earlier session already judged
+   them. For the ones with no scores, `score_files` to queue a run, telling the user it spends
+   Creative Units since no estimate tool prices scoring.
+3. Poll `get_file_scores` until scores appear. An empty list means not yet judged, so keep polling
+   rather than re-scoring.
+4. Two fail the transparency rule. Those are not judgement calls, so they go back through
    `background_removal` (`layer-image-editing`).
-4. View the remaining six together at their target size, not at full resolution, and check stroke
+5. View the remaining six together at their target size, not at full resolution, and check stroke
    weight and palette against the two icons approved earlier.
-5. One has drifted heavier than the set. Reroll that one against the approved icons as references.
-6. Deliver with the state named: six passing, one rerolled, two fixed for transparency.
+6. One has drifted heavier than the set. Reroll that one against the approved icons as references.
+7. Deliver with the state named: six passing, one rerolled, two fixed for transparency.
 
 ## Common mistakes
 
 - Judging by eye without checking whether scoring rules exist.
 - Reporting output as passing a gate when no rules were ever in force.
+- Reading `score_files` as if it returned verdicts, when it only acknowledges the queued run.
+- Reading an empty `scores` list as a zero rather than as not yet judged.
+- Re-scoring because the first call "returned nothing", which spends again and appends a second
+  verdict.
 - Re-scoring files whose verdicts `get_file_scores` already holds.
 - Judging an icon, texture, or loop outside the context it ships in.
 - Reviewing set members one at a time, so drift goes unnoticed.

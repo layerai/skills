@@ -84,11 +84,12 @@ cheaper. Ask which one they mean when the request is ambiguous.
 1. The intent is `reframing`, not a reroll of the portrait. Generating it again loses the approval.
 2. `list_base_models` with `filter.use_case: "reframing"`, take the first result.
 3. The portrait came from an earlier run, so it already has a `file_id`. No upload.
-4. `execute_forge` with that file as `init_image`, the target ratio, and an instruction naming what
-   must not change: "extend the scene above and below, keep the character, crop, and lighting
-   untouched."
-5. Estimate first, poll at `poll_interval_seconds`, present the result beside the original so the
-   user can confirm the subject survived.
+4. `estimate_forge_price` with that file as `init_image`, the target ratio, and an instruction
+   naming what must not change: "extend the scene above and below, keep the character, crop, and
+   lighting untouched." Above 20 CUs, present the table and wait for an explicit yes.
+5. `execute_forge` with exactly those arguments, then poll `get_forge_run` at
+   `poll_interval_seconds`.
+6. Present the result beside the original so the user can confirm the subject survived.
 
 ## Common mistakes
 

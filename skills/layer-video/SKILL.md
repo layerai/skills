@@ -52,8 +52,13 @@ model was tuned on.
 Clip length is per-model and short, usually a handful of seconds. Do not plan a 30-second piece as
 one generation without confirming a model supports it.
 
+Some models choose their own length and ignore `duration_seconds` entirely. When the clip has to land
+on an exact length, filter for `fixed_duration`, which excludes them. Without it a model may simply
+hand back a different length, and nothing in the response reads as an error.
+
 `generate_audio` is a capability, so filter for it when the clip needs native sound rather than
 assuming silence can be fixed later. `lipsync` is a separate capability for dialogue on a character.
+`filter.capabilities` is an object of booleans, not a list of names: `{generate_audio: true}`.
 
 Video runs count against a tighter rate limit than images: 60 generations per minute per user, of
 which at most 30 may be video.
@@ -72,18 +77,27 @@ Storyboard it first if there are more than three shots: see `layer-art-direction
 
 ## Loops
 
-A loop needs its last frame to return to its first. Generate the anchor frame, then use it as both
-`first_frame` and `last_frame` where the model accepts both. Failing that, keep the motion cyclical
-by nature (a flag in wind, a torch flicker, a hovering idle) and avoid one-way motion such as a
-character walking out of frame, which cannot be made to loop by any amount of prompting.
+Filter for the `loop` capability first. It selects models that compose a seam-free loop rather than
+merely describing one, which is a different thing from a model that will accept the word "looping" in
+a prompt and return a clip that jumps at the cut. Pair it with `fixed_duration` when the loop has to
+be a specific length.
+
+Failing that, generate the anchor frame and use it as both `first_frame` and `last_frame` where the
+model accepts both, so the motion at least returns to where it started.
+
+Either way, keep the motion cyclical by nature (a flag in wind, a torch flicker, a hovering idle) and
+avoid one-way motion such as a character walking out of frame, which cannot be made to loop by any
+amount of prompting.
 
 ## Worked example
 
 "Animate this approved character key frame into a 5-second idle loop."
 
 1. The frame exists from a previous run, so it already has a `file_id`.
-2. `list_base_models` with `filter.use_case: "image_to_video"`. Take the first result, then
-   `get_base_model` to see whether it accepts `last_frame` and structured `video_effects`.
+2. `list_base_models` with `filter.use_case: "image_to_video"` and
+   `filter.capabilities: {loop: true, fixed_duration: true}`, since this has to loop seamlessly and
+   land on five seconds. Take the first result, then `get_base_model` to see whether it accepts
+   `last_frame` and structured `video_effects`.
 3. Prompt the motion only: "The character breathes slowly, cloak drifting in a light breeze, weight
    shifting subtly between feet. Locked-off camera. Gentle, continuous, no change in pose by the end
    of the clip."
@@ -101,4 +115,6 @@ character walking out of frame, which cannot be made to loop by any amount of pr
 - Describing a camera move in prose when the model exposes `video_effects`.
 - Planning a long piece as one clip without checking a model's duration limit.
 - Assuming audio can be added later on a model that could have generated it natively.
+- Prompting for a loop instead of filtering for the `loop` capability.
+- Leaving `fixed_duration` off when the clip has to land on an exact length.
 - Calling a clip a loop without watching the seam.

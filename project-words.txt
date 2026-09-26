@@ -8,6 +8,7 @@ colourblind
 cutscene
 cutscenes
 dedupe
+denoise
 dithering
 evals
 foley
@@ -17,6 +18,7 @@ gouache
 inpaint
 inpainting
 Kling
+Krea
 layerai
 letterbox
 lineart
@@ -39,6 +41,7 @@ retopologising
 retopology
 roguelike
 scrim
+SDXL
 settleable
 SNES
 spritesheet
@@ -48,6 +51,7 @@ tileable
 tileset
 turnaround
 turnarounds
+UNET
 unpunctuated
 unsheathe
 vectorise

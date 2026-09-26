@@ -21,6 +21,7 @@
     "./skills/layer-3d",
     "./skills/layer-reference-sets",
     "./skills/layer-workflows",
+    "./skills/layer-workflow-import",
     "./skills/layer-quality"
   ],
   "keywords": [

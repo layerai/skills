@@ -34,8 +34,8 @@
     },
     {
       "title": "Consistency and pipelines",
-      "description": "Hold one look across a whole project with trained reference sets, and run the Blueprint workflows a studio has already built.",
-      "skills": ["layer-reference-sets", "layer-workflows"]
+      "description": "Hold one look across a whole project with trained reference sets, run the Blueprint workflows a studio has already built, and import workflows from other tools.",
+      "skills": ["layer-reference-sets", "layer-workflows", "layer-workflow-import"]
     },
     {
       "title": "Review",

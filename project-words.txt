@@ -8,6 +8,7 @@ colourblind
 cutscene
 cutscenes
 dedupe
+denoise
 dithering
 evals
 foley

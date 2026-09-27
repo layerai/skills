@@ -75,7 +75,7 @@ case the node serves.
    Fix and repeat until `is_valid` is true.
 6. `import_workflow` for real, with a clear `name` and a `description` that says where it came from.
    Pass `project_id` when the user wants it filed in a project.
-7. `estimate_workflow_price` with the sample inputs, confirm above 20 CUs, then `execute_workflow`
+7. `estimate_workflow_price` with the sample inputs, confirm above 20 CUs, then `execute_workflow` with a `session_name`
    and poll. A graph that validates can still produce the wrong thing; look at the output.
 8. Report: the workflow id, what was mapped to what, and anything dropped or approximated.
 

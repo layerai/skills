@@ -14,10 +14,20 @@ import { skillNames } from "./lib.mjs";
 
 const MANIFEST = "https://layer.ai/.well-known/mcp";
 
-// Tool names are verb-prefixed snake_case. These two tokens share that shape but are
-// not tools: one is a parameter, one is a `filter.use_case` value. Keep this list
-// minimal and justified; a growing list means the heuristic needs rethinking.
-const NOT_TOOLS = new Set(["set_id", "split_into_layers"]);
+// Tool names are verb-prefixed snake_case. These tokens share that shape but are not
+// tools: `set_id` is a reference-set field, `split_into_layers` a `filter.use_case`
+// value, `remove_background` an `execute_forge` flag, `start_seconds` an
+// `audio_segments` field, and `start_frame` / `start_from_in_seconds` timeline item
+// fields. Keep this list minimal and justified; a growing list means the heuristic
+// needs rethinking.
+const NOT_TOOLS = new Set([
+  "set_id",
+  "split_into_layers",
+  "remove_background",
+  "start_seconds",
+  "start_frame",
+  "start_from_in_seconds"
+]);
 
 const VERB_PREFIXED = new RegExp(
   "^(get|list|create|execute|estimate|start|cancel|render|upload|request|score|pack|" +

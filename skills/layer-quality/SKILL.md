@@ -10,13 +10,15 @@ license: MIT
 
 Generation is not delivery. A batch comes back, and something has to decide which of it is usable,
 against the brief and against whatever standards the studio has already set. Layer records those
-standards as output scoring rules, and exposes three tools:
+standards as output scoring rules, and records where each file stands as a lifecycle status:
 
-| Tool                        | Purpose                                                  |
-| --------------------------- | -------------------------------------------------------- |
-| `list_output_scoring_rules` | The rules in force for a workspace, optionally a project |
-| `score_files`               | Queue a scoring run. Asynchronous and billed             |
-| `get_file_scores`           | Read the verdicts recorded on one file                   |
+| Tool                           | Purpose                                                  |
+| ------------------------------ | -------------------------------------------------------- |
+| `list_output_scoring_rules`    | The rules in force for a workspace, optionally a project |
+| `score_files`                  | Queue a scoring run. Asynchronous and billed             |
+| `get_file_scores`              | Read the verdicts recorded on one file                   |
+| `list_file_lifecycle_statuses` | The statuses this workspace uses, with their ids         |
+| `set_file_lifecycle_status`    | Mark files In Review, Approved, or any other status      |
 
 Generation mechanics are in the `layer` skill. If a sibling skill named here is missing from your
 available skills, ask the user to install it (`npx skills add layerai/skills --skill <name>`);
@@ -77,6 +79,16 @@ name it (`layer-reference-sets`). Where a constraint was missed, name the constr
 Creative Units were spent either way, so a quiet pass costs the user a second discovery later, on
 work already built on the flawed asset.
 
+## Record the outcome
+
+A review that lives only in chat is lost. Close it on the files themselves with
+`set_file_lifecycle_status`, so the team sees the state in Layer: passing files to the workspace's
+approved status, failures back to review or on hold. Statuses belong to the workspace and may be
+renamed, reordered, removed or added to, so call `list_file_lifecycle_statuses` for the ids and match
+by name and phase rather than assuming "Approved" exists. One call sets up to 500 files; a
+`status_id` of null clears the status. Set a status only when the user asked for the review to be
+recorded or the workflow clearly expects it, since it is visible to the whole team.
+
 ## Worked example
 
 "Are these eight icons ready to ship?"
@@ -93,7 +105,9 @@ work already built on the flawed asset.
 5. View the remaining six together at their target size, not at full resolution, and check stroke
    weight and palette against the two icons approved earlier.
 6. One has drifted heavier than the set. Reroll that one against the approved icons as references.
-7. Deliver with the state named: six passing, one rerolled, two fixed for transparency.
+7. With the user's go-ahead, `list_file_lifecycle_statuses`, then `set_file_lifecycle_status` with
+   the passing `file_id` values and the approved status's id.
+8. Deliver with the state named: six passing, one rerolled, two fixed for transparency.
 
 ## Common mistakes
 
@@ -101,9 +115,9 @@ work already built on the flawed asset.
 - Reporting output as passing a gate when no rules were ever in force.
 - Reading `score_files` as if it returned verdicts, when it only acknowledges the queued run.
 - Reading an empty `scores` list as a zero rather than as not yet judged.
-- Re-scoring because the first call "returned nothing", which spends again and appends a second
-  verdict.
-- Re-scoring files whose verdicts `get_file_scores` already holds.
+- Re-scoring because the first call "returned nothing", or when `get_file_scores` already holds
+  verdicts: both spend again and append a second verdict.
+- Hard-coding a status name or id instead of reading `list_file_lifecycle_statuses`.
 - Judging an icon, texture, or loop outside the context it ships in.
 - Reviewing set members one at a time, so drift goes unnoticed.
 - Picking the most striking candidate rather than the one matching the brief.

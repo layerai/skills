@@ -147,6 +147,7 @@ gap.
 `UNAUTHENTICATED` means the OAuth flow was never completed, so send the user to their MCP client
 settings. `MODEL_NOT_FOUND` means re-discover with `list_base_models`, never guess again.
 `INSUFFICIENT_BALANCE` means direct the user to the Layer app to buy credits. `RATE_LIMITED` means
-too many concurrent runs, so wait or cancel one with `cancel_inference`. `FEATURE_DISABLED` means the
+the per-user generation limit, so wait the `Retry-After` interval and retry; never cancel a
+user's run to make room. `FEATURE_DISABLED` means the
 workspace lacks the feature, so point at in-app support rather than speculating about how to enable
 it.

@@ -49,7 +49,8 @@ Dataset quality decides the result far more than any parameter. The common failu
   that is identical throughout teaches the model to reproduce one image.
 - **Clean inputs.** Exclude watermarks, UI overlays, text, heavy compression, and images where the
   subject is small in frame or occluded.
-- **Match the category to the intent.** `character`, `object`, `scene`, or `general`. The
+- **Match the category to the intent.** On MCP, `create_reference_set` takes `character`,
+  `object`, `scene`, or `general`. The
   category shapes what the training attends to, so a character trained as `general` learns the
   background as part of the identity.
 
@@ -65,7 +66,7 @@ Over MCP, training has two inputs no tool supplies. Report them; do not work aro
   `draft_captions`, and `create_reference_set` takes no caption field, so the agent cannot write them
   either. If training fails on captions, tell the user to caption the set in the Layer app, then
   retry.
-- **The training model.** `start_training` requires a `base_model_id` that points at a
+- **The training model.** MCP's `start_training` requires a `base_model_id` that points at a
   recommendation tool MCP also does not expose. Do not guess one from `list_base_models`, whose
   ranking is for generation, not training; ask the user which model the set trains on, or have them
   start training in the app. Leave `training_framework` unset unless the user names one.

@@ -60,8 +60,9 @@ hand back a different length, and nothing in the response reads as an error.
 assuming silence can be fixed later. Dialogue and lip sync on a character are `layer-talking-characters`.
 `filter.capabilities` is an object of booleans, not a list of names: `{generate_audio: true}`.
 
-Concurrent runs are capped: `RATE_LIMITED` means wait for a run to finish or cancel one, not retry
-in a loop.
+Generation is [rate limited per user](https://layer.ai/docs/rate-limits): 600 per minute across all
+modalities, plus 300 video per minute. On `RATE_LIMITED`, wait the `Retry-After` interval, then
+retry; never cancel a run the user asked for to free a slot.
 
 ## Drafts before finals
 

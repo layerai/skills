@@ -14,7 +14,7 @@ exercise every time.
 
 The mechanics (upload, `create_reference_set`, `estimate_training_price`, `start_training`,
 `get_training_status`, `get_trained_model`, and the four categories) are covered by Layer's published
-`layer-train-custom-style` skill, over both REST and MCP. This skill covers the decisions that
+`layer-train-reference-set` skill, over both REST and MCP. This skill covers the decisions that
 determine whether the trained result is any good.
 
 If a sibling skill named here is missing from your available skills, ask the user to install it

@@ -102,7 +102,7 @@ Re-uploading a generated asset is always a mistake.
 ## Trained styles
 
 `list_reference_sets` returns the workspace's trained styles. Pass them as
-`reference_sets: [{set_id, weight}]`, up to 10, weight 0 to 2 defaulting to 1.0. With reference sets
+`reference_sets: [{set_id, weight}]`, up to 25, weight 0 to 2 defaulting to 1.0. With reference sets
 and no `base_model_id` the server picks a model that can apply them, which is usually what you want:
 the curated ranking is task fit, not reference-set fit. See `layer-reference-sets`.
 

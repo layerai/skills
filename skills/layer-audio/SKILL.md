@@ -45,10 +45,36 @@ Say what the track should not do. Background music for a game should not have an
 hook competing with dialogue, and stating "sparse, no lead melody, sits under voice" gets there
 faster than three rerolls.
 
-Where a model exposes structured fields (`lyrics`, `instrumental`, `speed`), use them instead of
-describing the same thing in prose. `get_base_model` is the authority on which apply. For anything
-that must loop, keep the arrangement steady rather than building to a climax that cannot rejoin its
-own start.
+Flags beat prose. Two outcomes are only guaranteed by a flag, so filter for the capability and set
+it on the run:
+
+- **No vocals:** `instrumental: true` (capability `instrumental`). "Instrumental" in the prompt is a
+  suggestion. Set it for background music and for anything that loops.
+- **A seamless loop:** `loop: true` (capability `loop`), so the provider composes the clip to repeat.
+  Asking for a loop in the prompt does not make one. Pair it with `fixed_duration` when the loop must
+  land on an exact length, and keep the arrangement steady rather than building to a climax.
+
+Sung words go in `lyrics`, separate from the prompt, with `[verse]` and `[chorus]` tags on their own
+lines. `output_format` takes only a container the model lists under `output_formats`; Layer never
+re-encodes, so asking for another fails the run.
+
+### A track with an arc
+
+When the shape matters (quiet intro, percussion only from the second section, a swell into the boss
+phase), require the `composition_plan` capability and pass a plan instead of narrating the arc. The
+split is the craft: the plan's own `positive_styles` and `negative_styles` hold for the whole track
+(genre, era, production, palette), and each section carries only what changes there. A section's
+`negative_styles` are the only way to keep it empty of something the rest of the track has. Sections
+run 3 to 120 seconds, at most 30 of them, 3 seconds to 10 minutes in total.
+
+A plan supersedes `prompt`, `duration_seconds` and `instrumental`, which are dropped. When the user
+also gave a prompt, say that it was folded into the plan's styles rather than sent.
+
+### Scoring a video
+
+On a model reporting `audio_segments`, score a video stretch by stretch: each segment has a
+`start_seconds`, `end_seconds` and `prompt`, and together they must tile the scored part with no gaps
+and no overlaps, each end being the next start. Cut the segments on the picture's own changes.
 
 ## Speech
 
@@ -85,5 +111,7 @@ four-minute take costs the whole take.
 - Asking for a sequence of events in one generation, then cutting the file apart by hand.
 - Leaving length unstated on a UI sound.
 - Omitting the function of a music cue, so a background loop arrives with a lead melody.
+- Writing "instrumental" or "seamless loop" in the prompt instead of setting `instrumental` or `loop`.
+- Narrating a multi-section arc in one prompt when the model takes a `composition_plan`.
 - Sending an unpunctuated script, or an invented name with no phonetic spelling.
 - Generating four minutes of narration in one call.

@@ -12,11 +12,22 @@ A texture is not an image of a surface. It is an image whose left edge continues
 and whose top continues into its bottom, so that a plane tiled with it shows no seam. A model will
 not do this unless the run asks for it.
 
-The mandatory step is the capability filter: `list_base_models` with
-`filter.capabilities: {tileability: true}`. Note the shape: `capabilities` is an object of booleans,
-not a list of names. A model without it produces a picture of stone that seams visibly the moment it
-repeats, and no editing pass fixes that afterwards. Everything else on this
-page is secondary to getting that filter right.
+The mandatory step is `tileability: true` on the run itself. Asking for a seamless texture in the
+prompt does not make the edges meet; the flag does. It works on any image generation or editing
+model, in one of two ways:
+
+- **Native.** A model whose capabilities report `native_tileability` generates the wrap itself. Find
+  one with `list_base_models` and `filter.capabilities: {tileability: true}` (an object of booleans,
+  not a list of names). Such a model then takes no LoRA style, so a trained reference set is not
+  applied to it.
+- **Joined afterwards.** Any other model has its edges joined after generation, as `tile_texture`
+  decides: `ORGANIC` (grass, sand, moss, water, rubble) and `PIXEL` (pixel art, also snapped to its
+  own grid and palette) are cut together at no cost. `STRUCTURED` (bricks, planks, panels), or
+  leaving it unset, repaints the edges in a separately billed run, so pass the same `tile_texture`
+  to `estimate_forge_price`.
+
+Upscales, layered outputs and vector outputs are never joined, so set `tileability` on the
+generation, not on a later pass. Everything else on this page is secondary to getting the flag right.
 
 Generation mechanics are in the `layer` skill. If a sibling skill named here is missing from your
 available skills, ask the user to install it (`npx skills add layerai/skills --skill <name>`);
@@ -63,27 +74,33 @@ material outputs, take them in the same run rather than deriving normals from th
 afterwards, which produces flat-looking surfaces. `get_base_model` is the authority on what a given
 model returns.
 
-Pixel-art tiles carry these rules plus their own: see `layer-pixel-art`.
+Pixel-art tiles carry these rules plus their own: see `layer-pixel-art`. Isometric and hex game tiles
+that snap to a grid are a different job (`tile_grid`), covered in `layer-tilesets`. To hand finished
+textures to an engine as a tileset, `export_tileset` accepts tileable textures of one size.
 
 ## Worked example
 
 "A seamless mossy stone floor for our dungeon."
 
 1. `list_base_models` with `filter.use_case: "text_to_image"` and
-   `filter.capabilities: {tileability: true, square: true}`. Take the first result. Without
-   `tileability` this run is wasted.
-2. `get_base_model`, to see whether it exposes a tiling parameter that must also be set, and what
-   material outputs it offers.
+   `filter.capabilities: {tileability: true, square: true}`. Take the first result: it wraps
+   natively, so no join is needed.
+2. `get_base_model`, for the material outputs it offers.
 3. Prompt: "Seamless tileable texture of worn dungeon flagstones with moss in the joints, covering
    roughly 2 metres square with about eight stones across. Even diffuse flat lighting, no directional
    shadows, no cast shadows. Uniform distribution of wear and moss across the whole tile, no focal
    point, no single dominant crack or feature. Top-down orthographic view."
-4. Estimate, then execute with `batch_size: 4` so there are options.
+4. Estimate and execute with `tileability: true` and `batch_size: 4` so there are options. Had the
+   filter returned nothing, the same flag on any image model with `tile_texture: "ORGANIC"` (moss
+   and stone joints read as organic) would join the edges at no extra cost.
 5. Judge each candidate at a 3x3 repeat before choosing.
 
 ## Common mistakes
 
-- Skipping the `tileability` filter, which no later step can compensate for.
+- Asking for "seamless" in the prompt without setting `tileability: true` on the run.
+- Leaving `tile_texture` unset on a non-native model for grass or sand, which pays for a repaint an
+  `ORGANIC` join does for free.
+- Setting `tileability` on an upscale or vectorise pass, which is never joined.
 - Omitting scale, so the tile is one enormous stone or a thousand tiny ones.
 - Accepting directional lighting baked into the tile.
 - A dramatic hero feature that becomes a visible grid when repeated.

@@ -17,6 +17,14 @@ rather than models, with no competing alternative in the catalogue.
 
 This is an assembly step, not a generation step. It composites assets that already exist. Generating
 the clips is `layer-video`, and the shots should be approved before any of them reach a timeline.
+Designed titles and logo reveals are `layer-motion-graphics`, one edit rendered as many variants is
+`layer-motion-templates`, and clip effects for a shared finish are `layer-video-looks`.
+
+`render_video_timeline` takes `{workspace_id, template, videos, images, audios}`. `template` is
+`{width, height, fps, tracks: [{id, name, items, transitions}]}`; an item is `{id, type, start_frame,
+duration_in_frames}` plus `file_id` or `slot`, and optionally `layout {left, top, width, height}`,
+`effects`, `start_from_in_seconds` to trim a clip's head, and `volume`; a `solid` takes `color`
+`{red, green, blue, alpha}`. The render returns a `generation_id` for `get_generation_run`.
 
 If a sibling skill named here is missing from your available skills, ask the user to install it
 (`npx skills add layerai/skills --skill <name>`); unattended, proceed from tool schemas and flag the

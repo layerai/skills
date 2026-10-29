@@ -13,8 +13,9 @@ brief. A video prompt describes **what changes over the clip**. A prompt that on
 scene yields a near-still image with drifting artefacts, which is the most common failure here.
 
 Pick the use case first: `text_to_video` from nothing, `image_to_video` to animate an existing
-frame, `video_extend` to continue a clip, `video_editing` to alter one. The loop and spend gate are
-in the `layer` skill. Assembling finished clips into one deliverable is `layer-video-timeline`.
+frame, `video_extend` to continue a clip, `video_editing` to alter one (repairing a clip rather than
+rerolling it is `layer-video-fixes`). The loop and spend gate are in the `layer` skill. Assembling
+finished clips into one deliverable is `layer-video-timeline`.
 
 If a sibling skill named here is missing from your available skills, ask the user to install it
 (`npx skills add layerai/skills --skill <name>`); unattended, proceed from tool schemas and flag the
@@ -43,9 +44,8 @@ Name three things, in this order:
 
 Model families disagree about conventions, so read `get_base_model` for the one you picked rather
 than reusing phrasing that worked on another family. Where a model exposes structured
-`video_effects` (entries with an uppercase `type` such as `ORBIT_360` or `DOLLY_IN`, plus an optional
-`weight` from 0 to 100), prefer that over describing the same move in prose: it is the parameter the
-model was tuned on.
+`video_effects` (`[{type: "DOLLY_IN", weight}]`), prefer that over prose for the same move. Choosing
+moves, lens, light, technique presets and pacing is `layer-video-direction`.
 
 ## Duration, audio, and lip sync
 
@@ -57,37 +57,48 @@ on an exact length, filter for `fixed_duration`, which excludes them. Without it
 hand back a different length, and nothing in the response reads as an error.
 
 `generate_audio` is a capability, so filter for it when the clip needs native sound rather than
-assuming silence can be fixed later. `lipsync` is a separate capability for dialogue on a character.
+assuming silence can be fixed later. Dialogue and lip sync on a character are `layer-talking-characters`.
 `filter.capabilities` is an object of booleans, not a list of names: `{generate_audio: true}`.
 
-Video runs count against a tighter rate limit than images: 60 generations per minute per user, of
-which at most 30 may be video.
+Generation is [rate limited per user](https://layer.ai/docs/rate-limits): 600 per minute across all
+modalities, plus 300 video per minute. On `RATE_LIMITED`, wait the `Retry-After` interval, then
+retry; never cancel a run the user asked for to free a slot.
+
+## Drafts before finals
+
+Where `get_base_model` reports `capabilities.draft`, iterate on drafts: `draft: true` renders a quick,
+low-cost take. Finish only the one you keep, with a second `execute_forge`: `base_model_id` set to the
+draft's `draft.completion_base_model_id`, `batch_size: 1`, the draft's `file_id` as a guidance file of
+type `draft.completion_guidance_type`, and no prompt or other generation parameters, since the
+completion keeps the draft's prompt, motion and length. The completion bills per second of the draft,
+so estimate it with the completion model and the draft's `duration_seconds`. A draft completes once
+and may expire (`draft.status`, `expires_at`), so finish a keeper promptly.
+
+## Subtitles
+
+Burned-in captions are their own use case, `video_subtitle`, not something to prompt for. Read the
+model's `subtitle_presets` and pass `subtitle_preset` spelled exactly as listed, plus
+`subtitle_alignment` and colours where its capabilities report them. Dynamic presets bill higher, so
+estimate with the same preset. Captions in other languages, and dubbing, are `layer-localization`.
 
 ## Multi-shot pieces
 
-An ad, trailer, or cutscene is several shots. Before assembling, check whether a model can render
-the whole thing in one generation, because one generation holds its own continuity and assembly does
-not. When assembly is genuinely needed:
-
-1. Lock the look with one approved still.
-2. Generate each shot as `image_to_video` from a frame consistent with that still.
-3. Cut them together with `layer-video-timeline`.
-
-Storyboard it first if there are more than three shots: see `layer-art-direction`.
+An ad, trailer, or cutscene is several shots. One generation holds its own continuity and a cut
+does not, so check first whether a model can render the piece in one. Otherwise lock the look with
+one approved still, then follow `layer-video-continuity` to chain shots and hold the character, and
+`layer-video-timeline` to cut them. Storyboard anything over three shots (`layer-art-direction`).
 
 ## Loops
 
-Filter for the `loop` capability first. It selects models that compose a seam-free loop rather than
-merely describing one, which is a different thing from a model that will accept the word "looping" in
-a prompt and return a clip that jumps at the cut. Pair it with `fixed_duration` when the loop has to
-be a specific length.
+Filter for the `loop` capability first: it selects models that compose a seam-free loop, not ones
+that accept the word "looping" and return a clip that jumps at the cut. Pair it with
+`fixed_duration` for a specific length.
 
 Failing that, generate the anchor frame and use it as both `first_frame` and `last_frame` where the
 model accepts both, so the motion at least returns to where it started.
 
-Either way, keep the motion cyclical by nature (a flag in wind, a torch flicker, a hovering idle) and
-avoid one-way motion such as a character walking out of frame, which cannot be made to loop by any
-amount of prompting.
+Either way, keep the motion cyclical (a flag in wind, a torch flicker, a hovering idle); one-way
+motion, such as a character walking out of frame, cannot loop.
 
 ## Worked example
 
@@ -112,9 +123,9 @@ amount of prompting.
 - Prompting the scene instead of the motion, then reporting the model "barely moved".
 - Using `text_to_video` when an approved still already exists.
 - Leaving the camera unspecified, then fighting drift the model added by default.
-- Describing a camera move in prose when the model exposes `video_effects`.
 - Planning a long piece as one clip without checking a model's duration limit.
 - Assuming audio can be added later on a model that could have generated it natively.
-- Prompting for a loop instead of filtering for the `loop` capability.
-- Leaving `fixed_duration` off when the clip has to land on an exact length.
+- Prompting for a loop instead of filtering for the `loop` capability, or leaving `fixed_duration`
+  off when the length matters.
+- Running full-quality takes to explore when the model offers drafts.
 - Calling a clip a loop without watching the seam.

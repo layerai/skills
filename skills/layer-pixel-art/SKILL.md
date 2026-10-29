@@ -56,6 +56,11 @@ The working sequence:
 4. `pack_sprite_sheet` to assemble them into a uniform-cell sheet. Its input schema is the
    authority on the argument shape, so read it rather than assuming the parameter name.
 
+Give every frame one delivery canvas: `output_fit` with `canvas: "FIXED"`, the sprite's `width` and
+`height`, and `anchor: "BOTTOM_CENTER"`, so each sprite stands on the same point of a same-sized
+canvas and the set shares one sprite size. `pack_sprite_sheet` only centres frames; it does not align
+ground lines, so a frame delivered without a shared canvas bobs when the sheet plays.
+
 Every frame after the first references **frame one**, not the frame before it. Chaining each frame
 off the last one compounds drift, so by frame four the knight is a different knight.
 
@@ -67,13 +72,19 @@ A four-frame cycle (contact, down, passing, up) reads as motion and is far more 
 Start there and add frames only if the motion needs them.
 
 Going the other way, `split_sprite_sheet` cuts a user's existing sheet into individual frames, which
-is the way to edit one frame of a sheet without touching the others.
+is the way to edit one frame of a sheet without touching the others. Leave `trim_transparent` off for
+animation frames: a cycle stays registered only while every frame keeps its full cell.
+
+High-resolution, non-pixel animation (painted or vector characters, directional cycles, Spine parts)
+is `layer-sprite-animation`.
 
 ## Tiles
 
-A pixel tile that repeats seamlessly is a tiling problem before it is a pixel problem, so filter for
-the `tileability` capability and read `layer-textures` for how to specify scale and avoid visible
-repetition. Everything on this page about grid, palette, and hard edges still applies.
+A pixel tile that repeats seamlessly is a tiling problem before it is a pixel problem: set
+`tileability: true` with `tile_texture: "PIXEL"`, which joins the edges at no cost and snaps the
+result to its own grid and palette. Read `layer-textures` for scale and visible repetition, and
+`layer-tilesets` for isometric or hex tiles that snap to a map grid. Everything on this page about
+grid, palette, and hard edges still applies.
 
 ## Worked example
 
@@ -85,7 +96,8 @@ repetition. Everything on this page about grid, palette, and hard edges still ap
    anti-aliasing, no blur, no gradients, isolated on transparent background."
 2. Approve one. This frame is now the reference for everything else.
 3. Three more runs, one per remaining frame, each attaching the approved frame as `reference_image`
-   and naming only the pose change.
+   and naming only the pose change. Every run, the first included, carries the same `output_fit`
+   (`FIXED`, 32x32, `BOTTOM_CENTER`).
 4. Check the four together for drift in palette, height, and armour detail. Reroll any that moved.
 5. `pack_sprite_sheet` with the four `file_id` values, which returns the sheet on a transparent
    background.
@@ -94,6 +106,7 @@ repetition. Everything on this page about grid, palette, and hard edges still ap
 
 - Omitting the grid size, then trying to downsample a soft image into pixels.
 - Asking one generation for a whole sprite sheet.
+- Frames on differently sized canvases, so the feet jump between cells.
 - Forgetting the anti-aliasing and blur exclusions, which are the defaults being excluded.
 - Generating frames independently with no reference frame, so the character drifts.
 - Generating an eight-frame cycle before a four-frame one works.

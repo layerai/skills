@@ -13,8 +13,8 @@ later runs apply by id, turning an art direction into a parameter instead of a p
 exercise every time.
 
 The mechanics (upload, `create_reference_set`, `estimate_training_price`, `start_training`,
-`get_training_status`, `get_trained_model`, and the five categories) are covered by Layer's published
-`layer-train-custom-style` skill, over both REST and MCP. This skill covers the decisions that
+`get_training_status`, `get_trained_model`, and the four categories) are covered by Layer's published
+`layer-train-reference-set` skill, over both REST and MCP. This skill covers the decisions that
 determine whether the trained result is any good.
 
 If a sibling skill named here is missing from your available skills, ask the user to install it
@@ -49,16 +49,31 @@ Dataset quality decides the result far more than any parameter. The common failu
   that is identical throughout teaches the model to reproduce one image.
 - **Clean inputs.** Exclude watermarks, UI overlays, text, heavy compression, and images where the
   subject is small in frame or occluded.
-- **Match the category to the intent.** `character`, `object`, `scene`, `effect`, or `general`. The
+- **Match the category to the intent.** On MCP, `create_reference_set` takes `character`,
+  `object`, `scene`, or `general`. The
   category shapes what the training attends to, so a character trained as `general` learns the
   background as part of the identity.
 
 When the user offers a large folder, curating it down is the highest-value thing to do before
 spending anything.
 
+## Two gaps in the training path
+
+Over MCP, training has two inputs no tool supplies. Report them; do not work around them:
+
+- **Captions.** `create_reference_set`'s description says to call `draft_captions` next, and
+  `start_training` refuses a dataset with missing captions (`invalid-dataset`). MCP exposes no
+  `draft_captions`, and `create_reference_set` takes no caption field, so the agent cannot write them
+  either. If training fails on captions, tell the user to caption the set in the Layer app, then
+  retry.
+- **The training model.** MCP's `start_training` requires a `base_model_id` that points at a
+  recommendation tool MCP also does not expose. Do not guess one from `list_base_models`, whose
+  ranking is for generation, not training; ask the user which model the set trains on, or have them
+  start training in the app. Leave `training_framework` unset unless the user names one.
+
 ## Apply it well
 
-Pass sets to `execute_forge` as `reference_sets: [{set_id, weight}]`, up to 10. `weight` runs 0 to 2
+Pass sets to `execute_forge` as `reference_sets: [{set_id, weight}]`, up to 25. `weight` runs 0 to 2
 and defaults to 1.0.
 
 **Prefer auto-pick.** With reference sets and no `base_model_id`, the server picks the model that
@@ -92,7 +107,9 @@ server picks a compatible model, or pick another one. Never describe a degraded 
 2. Upload the twelve, then `create_reference_set` with category `general`, since this is an overall
    aesthetic rather than one subject.
 3. `estimate_training_price`, present it against the balance, and confirm above 20 CUs.
-4. `start_training`, then `get_training_status` at the returned interval until terminal success.
+4. `start_training` with the training model the user named, then `get_training_status` at the
+   returned interval until terminal success. A caption error is the gap above, not a reason to
+   rebuild the set.
 5. `estimate_forge_price` with `reference_sets: [{set_id, weight: 1.0}]` and **no** `base_model_id`,
    so the server picks a model that can apply the LoRA. The estimate carries the contribution report,
    so check `reference_sets_degraded` here, before any spend.
@@ -105,6 +122,7 @@ server picks a compatible model, or pick another one. Never describe a degraded 
 - Padding a set with off-style images to reach a number.
 - Mixing characters, environments, and props into one set.
 - Training a character as `general`, so the background becomes part of the identity.
+- Guessing a training `base_model_id`, or rebuilding a set that failed only for missing captions.
 - Pinning `base_model_id` alongside reference sets, then reporting the style as weak.
 - Treating weight as on or off rather than tuning it.
 - Missing the degradation report and reporting a set as applied when it was not.

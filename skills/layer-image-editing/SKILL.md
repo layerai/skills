@@ -50,6 +50,17 @@ Mask edges matter. A hard-edged mask on a soft-edged subject leaves a halo. When
 smoke, or glass, prefer an instruction edit over a mask, because the model resolves the boundary
 better than your rectangle does.
 
+## Point at it instead of describing it
+
+"The lamp on the left" is ambiguous; a box on the lamp is not. On a model whose capabilities report
+`visual_annotations`, put numbered marks on the `init_image` (or on a `reference_image`, to say what
+to take from it) through the guidance file's `annotations`. Each item has an `id`, a `kind` (`BOX`,
+`ELLIPSE`, `ARROW`, `FREEHAND`, `PIN`), `points` from (0, 0) top left to (1, 1) bottom right, an
+`intent` (`EDIT`, `REMOVE`, or `MOVE` on an arrow whose `source_id` names the box to move) and a
+`note` saying what to do there. Two corners make a box or ellipse; an arrow is tail then head. Models
+of the `NATIVE_BOXES` kind take only boxes, and arrows moving a box, on the `init_image`. Leave
+`color` unset so it is chosen against the image.
+
 ## What to hold constant
 
 State it in the instruction. Models are literal about what you mention and careless about what you
@@ -61,8 +72,11 @@ reroll.
 
 "The same character from behind" appended to a text-to-image prompt produces a different character.
 Re-rendering an existing asset from another view needs `multi_angle`, a model whose capabilities
-report `camera_transform`, and the view supplied through the structured `camera` parameter, which
-orbits to side, back, or top, or zooms. Attach the source with the guidance type that model accepts.
+report `camera_transform`, and the view supplied through the structured `camera` parameter. Attach
+the source with the guidance type that model accepts. `yaw_degrees` orbits (90 right side, 180 back,
+270 left side), `pitch_degrees` looks down from -30 to 90 (90 is top-down), and `distance_delta` or
+`fov_delta_degrees` zooms. Omit a field to keep the source view: an explicit 0 is an active angle,
+not "unchanged".
 
 ## Upscaling
 
@@ -70,10 +84,21 @@ Upscaling adds resolution without changing what the picture depicts. It must nev
 generation model: re-rendering at a larger size is a new image that merely resembles the approved
 one, and approved art has to survive the step unchanged. Use `filter.use_case: "upscaling"`.
 
+## Vectors
+
+`vectorization` traces a raster into SVG; trace an approved, flat-coloured, cut-out asset, since
+gradients and noise become thousands of shapes. The `vectorize` options steer the trace:
+`vectorization_mode` (`spline` curves or `polygon` straight lines), `vectorization_color_mode`
+(`color`, or `binary` black and white), `vectorization_layering` (`stacked` overlapping shapes or
+`cutout` with no overlap, colour mode only), `vectorization_filter_speckle` (drop specks under N
+pixels, 0 to 20) and `vectorization_color_precision` (1 to 10, lower merges more colours). For a logo
+or icon, lower the precision and raise the speckle filter before rerunning anything.
+
 ## Layers
 
 `split_into_layers` produces genuinely separate, independently editable elements, for rigging,
-parallax, or compositing. Before reaching for it, check what the user actually wants: "give me a PSD"
+or compositing. A side-scroller background split by depth is a different job, the `parallax` split
+in `layer-environments`. Before reaching for it, check what the user actually wants: "give me a PSD"
 usually means "give me the art with a transparent background", which is `background_removal` and far
 cheaper. Ask which one they mean when the request is ambiguous.
 
@@ -84,7 +109,8 @@ cheaper. Ask which one they mean when the request is ambiguous.
 1. The intent is `reframing`, not a reroll of the portrait. Generating it again loses the approval.
 2. `list_base_models` with `filter.use_case: "reframing"`, take the first result.
 3. The portrait came from an earlier run, so it already has a `file_id`. No upload.
-4. `estimate_forge_price` with that file as `init_image`, the target ratio, and an instruction
+4. `estimate_forge_price` with that file as `init_image`, both `width` and `height` for 9:16 (with
+   either missing, the output takes the source's geometry), and an instruction
    naming what must not change: "extend the scene above and below, keep the character, crop, and
    lighting untouched." Above 20 CUs, present the table and wait for an explicit yes.
 5. `execute_forge` with exactly those arguments, then poll `get_forge_run` at
@@ -96,7 +122,9 @@ cheaper. Ask which one they mean when the request is ambiguous.
 - Stacking edits on edits instead of returning to the source image.
 - Using `image_editing` when only one region should change, then explaining the collateral damage.
 - Omitting what must stay constant.
-- Appending "from behind" to a prompt instead of using `multi_angle` with `camera`.
+- Appending "from behind" to a prompt instead of using `multi_angle` with `camera`, or passing 0
+  for an axis that should stay unchanged.
+- Describing a location in words when the model takes `annotations`.
 - Re-rendering an approved asset through a generation model to make it bigger.
 - Reaching for `split_into_layers` when the user just wants a transparent background.
 - Uploading an asset Layer already produced, which already has a `file_id`.

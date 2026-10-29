@@ -16,7 +16,7 @@ Layer already publishes six skills at
 [`layer.ai/.well-known/agent-skills/`](https://layer.ai/.well-known/agent-skills/index.json), served
 from the product and discoverable by any agent. They teach **platform mechanics**, REST first and
 MCP second: `layer-api-authentication`, `layer-connect-mcp`, `layer-generate-assets`,
-`layer-run-workflows`, `layer-train-custom-style`, `layer-manage-workspace`.
+`layer-run-workflows`, `layer-train-reference-set`, `layer-manage-workspace`.
 
 This repository does not duplicate them. It is the **craft layer above** them.
 

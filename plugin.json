@@ -39,7 +39,8 @@
           "Estimate what a 5-second video of a flying dragon would cost",
           "Which Layer models work best for stylized 3D props?"
         ],
-        "logo": "./assets/logo.png"
+        "logo": "./assets/logo.png",
+        "composerIcon": "./assets/logo.png"
       },
       "onboardingSkill": "./skills/layer/SKILL.md",
       "review": {

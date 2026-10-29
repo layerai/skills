@@ -67,14 +67,17 @@ function checkPlugin({ manifest, skills, fileExists }) {
       "com.openai.interface.defaultPrompt allows at most 3 prompts, each one line of 1-128 characters"
     );
   }
-  if (ui.logo === undefined)
-    errors.push("com.openai.interface.logo is required for OpenAI submission");
+  for (const field of ["logo", "composerIcon"]) {
+    if (ui[field] === undefined)
+      errors.push(`com.openai.interface.${field} is required for OpenAI submission`);
+  }
   for (const key of ["apps", "hooks"]) {
     if (key in openai) errors.push(`com.openai.${key} makes the package unsubmittable to OpenAI`);
   }
 
   const pluginPaths = [
     ["com.openai.interface.logo", ui.logo],
+    ["com.openai.interface.composerIcon", ui.composerIcon],
     ["com.openai.onboardingSkill", openai.onboardingSkill],
     ["com.anthropic.icon", manifest.extensions?.["com.anthropic"]?.icon]
   ];

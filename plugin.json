@@ -1,0 +1,106 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "layer",
+  "version": "0.2.0",
+  "description": "AI game asset creation: generate 2D, 3D, video, and audio assets and run creative workflows from your agent, powered by Layer's model-agnostic platform.",
+  "author": { "name": "Layer", "url": "https://layer.ai" },
+  "homepage": "https://layer.ai",
+  "repository": "https://github.com/layerai/skills",
+  "license": "MIT",
+  "keywords": [
+    "layer",
+    "game-assets",
+    "image-generation",
+    "3d",
+    "video",
+    "audio",
+    "creative-workflows",
+    "mcp",
+    "video-generation",
+    "pixel-art",
+    "sprites",
+    "textures",
+    "lora"
+  ],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Layer",
+        "shortDescription": "AI game asset creation",
+        "longDescription": "Layer is a model-agnostic platform for AI game-asset creation. Generate 2D images, 3D meshes, video, and audio; estimate the creative-unit cost of a generation before running it; run saved multi-step creative workflows; and manage your Layer workspaces, projects, and file uploads. Connect your existing Layer account to get started.",
+        "developerName": "Layer",
+        "category": "Creativity",
+        "websiteURL": "https://layer.ai",
+        "supportURL": "https://help.layer.ai/en/",
+        "privacyPolicyURL": "https://layer.ai/privacy-policy",
+        "termsOfServiceURL": "https://layer.ai/terms-of-service",
+        "defaultPrompt": [
+          "Generate a pixel-art sword icon for my game",
+          "Estimate what a 5-second video of a flying dragon would cost",
+          "Which Layer models work best for stylized 3D props?"
+        ],
+        "logo": "./assets/logo.png"
+      },
+      "onboardingSkill": "./skills/layer/SKILL.md",
+      "review": {
+        "demo_recording_url": "https://media.app.layer.ai/workspaces/16a8d0c0-56b6-4517-9a87-e4321f1a64ab/files/24c4cf36-1b8e-490c-98e9-f71445215daf/layer-plugin-fast.mp4",
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Lists the user's workspaces and projects",
+              "prompt": "Which Layer workspaces and projects do I have?",
+              "tools_triggered": "list_workspaces, list_projects",
+              "expected_behavior": "Lists the workspace names and the projects in each without starting any generation."
+            },
+            {
+              "description": "Recommends models for a modality",
+              "prompt": "Which Layer models are best for pixel-art sprites?",
+              "tools_triggered": "list_base_models",
+              "expected_behavior": "Returns a short list of recommended image models with a one-line reason for each."
+            },
+            {
+              "description": "Estimates cost without generating",
+              "prompt": "How many creative units would a 1024x1024 image of a medieval castle cost?",
+              "tools_triggered": "estimate_forge_price",
+              "expected_behavior": "Reports the creative-unit estimate and does not start a generation."
+            },
+            {
+              "description": "Generates an image after showing the cost",
+              "prompt": "Generate a 1024x1024 image of a cartoon treasure chest in my default project.",
+              "tools_triggered": "estimate_forge_price, execute_forge, get_forge_run",
+              "expected_behavior": "States the creative-unit cost, runs the generation, polls until it finishes, and returns the resulting image."
+            },
+            {
+              "description": "Lists workflows and estimates one",
+              "prompt": "Show the workflows in my project and estimate the cost of running the first one.",
+              "tools_triggered": "list_workflows, estimate_workflow_price",
+              "expected_behavior": "Lists the project's workflows and reports the creative-unit estimate for the first without running it."
+            }
+          ],
+          "negative": [
+            {
+              "description": "General knowledge question",
+              "prompt": "What is the capital of France?"
+            },
+            {
+              "description": "Coding task unrelated to assets",
+              "prompt": "Write a Python function that reverses a string."
+            },
+            { "description": "Travel booking", "prompt": "Book me a flight to Tokyo next Friday." }
+          ]
+        }
+      },
+      "publication": {
+        "release_notes": "Adds 31 craft skills (sprites, tilesets, textures, video, audio, game UI, UA creatives, and more) and makes the layer skill the onboarding skill, replacing using-layer."
+      }
+    },
+    "com.anthropic": {
+      "displayName": "Layer",
+      "icon": "./assets/logo.png",
+      "documentationUrl": "https://layer.ai/docs/mcp",
+      "supportUrl": "https://help.layer.ai/en/",
+      "privacyPolicyUrl": "https://layer.ai/privacy-policy",
+      "termsOfServiceUrl": "https://layer.ai/terms-of-service"
+    }
+  }
+}

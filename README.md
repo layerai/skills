@@ -18,10 +18,17 @@ npx skills add layerai/skills --skill "*"
 `--skill "*"` takes every skill and skips the picker. Running the bare command opens a picker with
 nothing preselected, so pressing enter installs nothing.
 
-As a Claude Code plugin marketplace, which also wires up the MCP server:
+As a plugin, which also wires up the MCP server. Claude Code, then pick the groups you want:
 
 ```bash
 /plugin marketplace add layerai/skills
+```
+
+Codex, and ChatGPT desktop after a restart:
+
+```bash
+codex plugin marketplace add layerai/skills
+codex plugin add layer@layer
 ```
 
 ## Prerequisites

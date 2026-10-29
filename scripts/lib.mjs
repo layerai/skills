@@ -50,3 +50,11 @@ export function readGroupings() {
 export function version() {
   return readFileSync("VERSION", "utf8").trim();
 }
+
+export function readJson(path) {
+  return JSON.parse(readFileSync(path, "utf8"));
+}
+
+export function readPlugin() {
+  return readJson("plugin.json");
+}

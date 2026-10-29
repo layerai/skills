@@ -1,0 +1,39 @@
+name: Plugin
+
+# Validates the plugin for the OpenAI and Claude directories and uploads the
+# OpenAI portal ZIP. The checking logic lives in the Taskfile.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: plugin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: arduino/setup-task@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: npm install -g @anthropic-ai/claude-code@2.1.289
+      - run: task plugin:validate
+      - run: task package
+      - uses: actions/upload-artifact@v4
+        with:
+          name: openai-plugin-zip
+          path: dist/*.zip
+          if-no-files-found: error

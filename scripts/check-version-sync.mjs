@@ -13,6 +13,7 @@ if (!/^\d+\.\d+\.\d+$/.test(v)) {
 }
 
 const sites = [
+  ["plugin.json", (j) => j.version],
   [".claude-plugin/plugin.json", (j) => j.version],
   [".claude-plugin/marketplace.json", (j) => j.plugins.map((p) => p.version)],
   [".cursor-plugin/plugin.json", (j) => j.version],

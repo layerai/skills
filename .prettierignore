@@ -3,3 +3,4 @@ VERSION
 CHANGELOG.md
 evals/**/fixtures/
 .husky/_/
+dist/

@@ -7,21 +7,21 @@
       "name": "01.-getting-started",
       "source": "./",
       "description": "Connect to Layer and learn the generation loop every other skill builds on: model discovery, the spend gate, uploads, and polling.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": ["./skills/layer"]
     },
     {
       "name": "02.-direction",
       "source": "./",
       "description": "Agree a look before generating at volume: moodboards, storyboards, colour, era, and framing.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": ["./skills/layer-art-direction"]
     },
     {
       "name": "03.-images",
       "source": "./",
       "description": "Generate stills and change the ones you already have: prompting, sizing, references, masked edits, reframing, upscaling, layers, and exact text in a brand font.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-image",
         "./skills/layer-image-editing",
@@ -32,7 +32,7 @@
       "name": "04.-game-art",
       "source": "./",
       "description": "Art that has to sit in a system: characters and casts, environments, parallax and skyboxes, isometric and hex tilesets, 9-slice UI and icon sets, pixel sprites, HD sprite animation, VFX, and seamless textures.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-game-assets",
         "./skills/layer-environments",
@@ -48,7 +48,7 @@
       "name": "05.-video-and-audio",
       "source": "./",
       "description": "Generate motion and sound: animating stills, camera and shot language, multi-shot continuity, repairing a clip instead of rerolling it, talking characters and lip sync, sound effects, music, and speech.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-video",
         "./skills/layer-video-direction",
@@ -62,7 +62,7 @@
       "name": "06.-editing-and-motion-graphics",
       "source": "./",
       "description": "Finish what you generated: cut shots into one video, give the cut a consistent look, animate logos, titles and end cards in the brand font, and render one template into many variants.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-video-timeline",
         "./skills/layer-video-looks",
@@ -74,14 +74,14 @@
       "name": "07.-3d",
       "source": "./",
       "description": "Meshes for a game engine: generation from text or image, remeshing, retexturing, rigging, and animation.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": ["./skills/layer-3d"]
     },
     {
       "name": "08.-marketing-and-live-ops",
       "source": "./",
       "description": "Creative that sells and sustains a game: user-acquisition ad matrices, store listing art, localised assets and dubs, and the upgrade chains and seasonal reskins a live game ships every week.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-ua-creatives",
         "./skills/layer-store-assets",
@@ -93,7 +93,7 @@
       "name": "09.-consistency-and-pipelines",
       "source": "./",
       "description": "Hold one look across a whole project with trained reference sets, run the Blueprint workflows a studio has already built, and import workflows from other tools.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": [
         "./skills/layer-reference-sets",
         "./skills/layer-workflows",
@@ -104,7 +104,7 @@
       "name": "10.-review",
       "source": "./",
       "description": "Judge a batch before it ships: scoring rules, verdicts, and reviewing a set against the brief.",
-      "version": "0.1.0",
+      "version": "0.2.0",
       "skills": ["./skills/layer-quality"]
     }
   ]

@@ -1,8 +1,8 @@
 {
   "name": "layer",
   "displayName": "Layer",
-  "version": "0.1.0",
-  "description": "Generate game and entertainment assets with Layer: images, video, 3D, and audio, with the craft knowledge to direct them.",
+  "version": "0.2.0",
+  "description": "AI game asset creation: generate 2D, 3D, video, and audio assets and run creative workflows from your agent, powered by Layer's model-agnostic platform.",
   "author": { "name": "Layer", "url": "https://layer.ai" },
   "homepage": "https://layer.ai",
   "repository": "https://github.com/layerai/skills",
@@ -41,18 +41,20 @@
     "./skills/layer-workflow-import",
     "./skills/layer-quality"
   ],
-  "mcpServers": "./.mcp.json",
   "keywords": [
     "layer",
     "game-assets",
     "image-generation",
-    "video-generation",
     "3d",
+    "video",
     "audio",
+    "creative-workflows",
+    "mcp",
+    "video-generation",
     "pixel-art",
     "sprites",
     "textures",
-    "lora",
-    "mcp"
-  ]
+    "lora"
+  ],
+  "mcpServers": "./.mcp.json"
 }

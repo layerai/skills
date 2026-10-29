@@ -143,6 +143,8 @@ tasks:
         `# The MCP endpoint is OAuth-walled and answers 401. Excluded by name` \
         `# rather than accepting 401 globally, which would mask real link rot.` \
         --exclude '^https://mcp\.app\.layer\.ai/mcp$' \
+        `# The OpenAI plugin portal is bot-walled and answers 403 to any non-browser client.` \
+        --exclude '^https://platform\.openai\.com/plugins$' \
         './**/*.md'
 
   # ── Commit and pull request hygiene ──

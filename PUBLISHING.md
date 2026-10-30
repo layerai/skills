@@ -6,7 +6,7 @@ CI builds and validates the plugin. Listing it in a directory and every OpenAI r
 
 1. `task version:set VERSION=x.y.z`. Claude Code users only receive an update when the version
    changes, and OpenAI rejects a submission that reuses a version.
-2. Update `extensions["com.openai"].publication.release_notes` in `plugin.json`.
+2. Update `extensions["com.openai"].publication.release_notes` in `plugins/layer/plugin.json`.
 3. `task check`, commit, and merge to `main`.
 4. Download the `openai-plugin-zip` artifact from the Plugin workflow run on `main` for the
    OpenAI upload, or build it locally with `task package`.
@@ -22,7 +22,7 @@ partner contact before submitting. Installs from this repository's marketplace a
 With permission, list the plugin once at <https://claude.ai/directory/manage>. You need a paid Claude
 plan and a connected GitHub account with push access to the repository.
 
-1. Submit a **Plugin bundle**: repository `layerai/skills`, plugin path `./`, branch `main`. You
+1. Submit a **Plugin bundle**: repository `layerai/skills`, plugin path `plugins/layer`, branch `main`. You
    can't change the repository or folder later.
 2. Press **Validate** in the portal. It checks README length, license, and name availability, which
    `claude plugin validate` doesn't.

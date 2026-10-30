@@ -1,6 +1,8 @@
 import { readdirSync } from "node:fs";
 
-const skillScopes = readdirSync(new URL("./skills", import.meta.url), { withFileTypes: true })
+const skillScopes = readdirSync(new URL("./plugins/layer/skills", import.meta.url), {
+  withFileTypes: true
+})
   .filter((e) => e.isDirectory())
   .map((e) => e.name);
 

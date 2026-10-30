@@ -2,7 +2,8 @@
 // VERSION is the single source of truth. Every manifest that declares a version
 // must agree with it, so a release can never half-land.
 import { readFileSync } from "node:fs";
-import { version } from "./lib.mjs";
+import { join } from "node:path";
+import { PLUGIN_DIR, version } from "./lib.mjs";
 
 const v = version();
 let failed = false;
@@ -13,11 +14,10 @@ if (!/^\d+\.\d+\.\d+$/.test(v)) {
 }
 
 const sites = [
-  ["plugin.json", (j) => j.version],
-  [".claude-plugin/plugin.json", (j) => j.version],
-  [".claude-plugin/marketplace.json", (j) => j.plugins.map((p) => p.version)],
-  [".cursor-plugin/plugin.json", (j) => j.version],
-  [".codex-plugin/plugin.json", (j) => j.version]
+  [join(PLUGIN_DIR, "plugin.json"), (j) => j.version],
+  [join(PLUGIN_DIR, ".claude-plugin/plugin.json"), (j) => j.version],
+  [join(PLUGIN_DIR, ".cursor-plugin/plugin.json"), (j) => j.version],
+  [".claude-plugin/marketplace.json", (j) => j.plugins.map((p) => p.version)]
 ];
 
 for (const [path, pick] of sites) {

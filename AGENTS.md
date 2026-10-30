@@ -35,14 +35,20 @@ one that stays right.
 ## Layout
 
 ```
-skills/<name>/SKILL.md       # name must equal the directory name
-skills/<name>/references/    # only when linked from SKILL.md
-tests/<name>/                # tests for any script shipped with skill <name>
-plugin.json                  # the plugin's identity and its OpenAI and Claude directory listings
-mcp.json                     # the Layer MCP server, in Agent Plugins form
-assets/                      # listing images
-PLUGIN.md                    # the plugin README directory reviewers read, shipped in the ZIP
+plugins/layer/                          # the plugin: everything a client installs, nothing else
+plugins/layer/skills/<name>/SKILL.md    # name must equal the directory name
+plugins/layer/skills/<name>/references/ # only when linked from SKILL.md
+plugins/layer/plugin.json               # the plugin's identity and its OpenAI and Claude listings
+plugins/layer/mcp.json                  # the Layer MCP server, in Agent Plugins form
+plugins/layer/assets/                   # listing images
+plugins/layer/README.md                 # the README directory reviewers read, shipped in the ZIP
+tests/<name>/                           # tests for any script shipped with skill <name>
 ```
+
+The plugin is one folder so that an install, a directory scan, and the OpenAI ZIP all see exactly
+what ships. Repository tooling (`scripts/`, `evals/`, the Taskfile) stays outside it. There is one
+plugin, `layer`, for every client; `skills.sh.json` groups skills for the README and the skills CLI
+only.
 
 Supporting files sit next to a SKILL.md only when the content is too large to inline, and must be
 linked directly from SKILL.md: agents resolve file references one level deep, so a reference chained
@@ -81,7 +87,7 @@ description never fires.
 
 - 1000 words is the house target. The build fails past 2500 (`task style`).
 - Measure the exact number `task style` checks (`task words` prints it per skill):
-  `awk '/^---$/{c++; next} c>=2' skills/<name>/SKILL.md | wc -w`
+  `awk '/^---$/{c++; next} c>=2' plugins/layer/skills/<name>/SKILL.md | wc -w`
 - Structure: Overview, Quick reference, one excellent worked example, Common mistakes.
 - Why a budget at all: the body enters context only when the skill triggers, and then every word
   competes with the user's task. Claude Code's post-compaction re-attach keeps the first 5000 tokens
@@ -162,7 +168,7 @@ path for readers who want it. A capability MCP does not expose is a gap worth re
 something to bridge with a raw HTTP call. Fetching a URL an MCP tool already returned is not an API
 call and stays fine.
 
-Scripts under `skills/<name>/scripts/` are the exception and may use whatever tool fits, as long as
+Scripts under `plugins/layer/skills/<name>/scripts/` are the exception and may use whatever tool fits, as long as
 the body says what the script does and who runs it, so no agent reads it as the workflow.
 
 ### Sibling skills
@@ -213,16 +219,17 @@ work offline. Each is its own CI job:
   only a scheduled check sees that.
 - `task links` checks every link resolves, through Docker so CI and a local run share one code path.
 - `task plugin:validate` checks `plugin.json` and `mcp.json` against the Agent Plugins schemas and
-  runs `claude plugin validate . --strict`. Its CI job also runs `task package`, which writes the
+  runs `claude plugin validate --strict` on the plugin and on the marketplace. Its CI job also runs `task package`, which writes the
   OpenAI portal ZIP, and uploads it as an artifact.
 
 Run `task format` before `task check` after writing markdown: prettier reflows prose and rewrites
 tables, so `format:check` rejects correct hand-written markdown.
 
-`skills.sh.json` is the single source of truth for grouping, and `plugin.json` for the plugin's
-identity, listing fields, and Claude-only fields (`extensions["com.anthropic"]`). The manifests under
-`.claude-plugin/`, `.cursor-plugin/`, `.codex-plugin/`, and `.agents/`, `.mcp.json`, and the README
-skills table are generated from them (`task manifest`); never edit any of them by hand.
+`skills.sh.json` is the single source of truth for grouping and skill order, and
+`plugins/layer/plugin.json` for the plugin's identity, listing fields, and Claude-only fields
+(`extensions["com.anthropic"]`). The root marketplaces (`.claude-plugin/`, `.cursor-plugin/`,
+`.agents/`), the plugin's `.claude-plugin/`, `.cursor-plugin/` and `.mcp.json`, and the README skills
+table are generated from them (`task manifest`); never edit any of them by hand.
 `plugin.json`'s own `version` is rewritten from `VERSION`. Releasing to the plugin directories is in
 [PUBLISHING.md](PUBLISHING.md).
 

@@ -8,7 +8,8 @@
 // plan against https://layer.ai/docs/mcp/tools and https://layer.ai/.well-known/mcp,
 // fetched fresh. The failure list is in AGENTS.md, "Application test protocol".
 import { readFileSync } from "node:fs";
-import { skillNames } from "./lib.mjs";
+import { join } from "node:path";
+import { SKILLS_DIR, skillNames } from "./lib.mjs";
 
 const [name, task] = process.argv.slice(2);
 
@@ -22,7 +23,7 @@ if (!skillNames().includes(name)) {
   process.exit(1);
 }
 
-const read = (n) => readFileSync(`skills/${n}/SKILL.md`, "utf8");
+const read = (n) => readFileSync(join(SKILLS_DIR, n, "SKILL.md"), "utf8");
 
 // Real installs ship the core skill alongside every other one, so the test does too.
 const installed = name === "layer" ? [name] : ["layer", name];

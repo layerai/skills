@@ -1,49 +1,48 @@
 #!/usr/bin/env node
 // Generates the plugin manifests from plugin.json, mcp.json, skills.sh.json, and VERSION.
 // plugin.json holds the plugin's identity and directory listings, mcp.json the MCP
-// servers, skills.sh.json the groupings, VERSION the version. The generated files are
+// servers, skills.sh.json the skill order, VERSION the version. The generated files are
 // never edited by hand, and plugin.json's own `version` is rewritten from VERSION.
 //
-// The Claude Code marketplace picker groups by plugin entry and sorts group names
-// alphabetically, so plugin names carry a two-digit position prefix to preserve the
-// skills.sh.json order. Inserting a grouping renumbers the ones after it.
+// Every client gets the same single plugin from PLUGIN_DIR. The root marketplaces only
+// point at it, so an install copies that folder and nothing else from the repository.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import prettier from "prettier";
-import { readGroupings, readJson, readPlugin, version } from "./lib.mjs";
+import { PLUGIN_DIR, readGroupings, readJson, readPlugin, version } from "./lib.mjs";
 
 const check = process.argv.includes("--check");
 const v = version();
 const config = readGroupings();
 const plugin = { ...readPlugin(), version: v };
 
-const slug = (title) =>
-  title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+const source = `./${PLUGIN_DIR}`;
+const owner = { name: "Layer", url: "https://layer.ai" };
+const marketplaceDescription =
+  "Layer skills: creative craft for AI game and entertainment asset generation.";
 
 const marketplace = {
   name: "layer",
-  owner: { name: "Layer", url: "https://layer.ai" },
-  description: "Layer skills: creative craft for AI game and entertainment asset generation.",
-  plugins: config.groupings.map((group, i) => ({
-    name: `${String(i + 1).padStart(2, "0")}.-${slug(group.title)}`,
-    source: "./",
-    description: group.description,
-    version: v,
-    skills: group.skills.map((name) => `./skills/${name}`)
-  }))
+  owner,
+  description: marketplaceDescription,
+  plugins: [{ name: plugin.name, source, description: plugin.description, version: v }]
 };
 
-// Codex and ChatGPT read the root plugin.json and mcp.json; this marketplace lists them.
+const cursorMarketplace = {
+  name: "layer",
+  owner,
+  metadata: { description: marketplaceDescription },
+  plugins: [{ name: plugin.name, source, description: plugin.description }]
+};
+
+// Codex and ChatGPT read the plugin's plugin.json and mcp.json; this marketplace lists them.
 const openaiMarketplace = {
   name: "layer",
   interface: { displayName: "Layer" },
   plugins: [
     {
       name: plugin.name,
-      source: { source: "local", path: "./" },
+      source: { source: "local", path: source },
       policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
       category: plugin.extensions["com.openai"].interface.category
     }
@@ -55,7 +54,7 @@ const openaiMarketplace = {
 const CLAUDE_SERVER_TYPES = { "streamable-http": "http", sse: "sse" };
 const claudeMcp = {
   mcpServers: Object.fromEntries(
-    Object.entries(readJson("mcp.json").mcpServers).map(([name, server]) => {
+    Object.entries(readJson(join(PLUGIN_DIR, "mcp.json")).mcpServers).map(([name, server]) => {
       const type = CLAUDE_SERVER_TYPES[server.type];
       if (!type)
         throw new Error(`mcp.json: server "${name}" has no Claude type for "${server.type}"`);
@@ -85,19 +84,15 @@ const claudePlugin = {
   ...plugin.extensions["com.anthropic"]
 };
 
-const codexPlugin = {
-  ...cursor,
-  mcpServers: "./.mcp.json"
-};
-
+const inPlugin = (path) => join(PLUGIN_DIR, path);
 const targets = [
-  ["plugin.json", plugin],
+  [inPlugin("plugin.json"), plugin],
+  [inPlugin(".claude-plugin/plugin.json"), claudePlugin],
+  [inPlugin(".cursor-plugin/plugin.json"), cursor],
+  [inPlugin(".mcp.json"), claudeMcp],
   [".claude-plugin/marketplace.json", marketplace],
-  [".agents/plugins/marketplace.json", openaiMarketplace],
-  [".claude-plugin/plugin.json", claudePlugin],
-  [".mcp.json", claudeMcp],
-  [".cursor-plugin/plugin.json", cursor],
-  [".codex-plugin/plugin.json", codexPlugin]
+  [".cursor-plugin/marketplace.json", cursorMarketplace],
+  [".agents/plugins/marketplace.json", openaiMarketplace]
 ];
 
 // Format through prettier with the repo config, so a generated manifest and a

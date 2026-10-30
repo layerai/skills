@@ -2,7 +2,8 @@
 // Checks plugin.json against what the OpenAI and Claude plugin directories require,
 // so a listing problem fails here rather than in a portal review.
 import { existsSync } from "node:fs";
-import { readPlugin, readSkill, skillNames } from "./lib.mjs";
+import { join } from "node:path";
+import { PLUGIN_DIR, SKILLS_DIR, readPlugin, readSkill, skillNames } from "./lib.mjs";
 
 const NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const SEMVER = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?(?:\+[0-9A-Za-z.-]+)?$/;
@@ -106,7 +107,7 @@ function checkPlugin({ manifest, skills, fileExists }) {
   }
 
   for (const skill of skills) {
-    const where = `skills/${skill.dir}`;
+    const where = `${SKILLS_DIR}/${skill.dir}`;
     if (`${name}:${skill.name}`.length > 64)
       errors.push(`${where}: "${name}:${skill.name}" exceeds 64 characters`);
     if (!isText(skill.description, 1024))
@@ -125,7 +126,11 @@ const skills = skillNames().map((dir) => {
   const { frontmatter, body } = readSkill(dir);
   return { dir, name: frontmatter.name, description: frontmatter.description, body };
 });
-const errors = checkPlugin({ manifest: readPlugin(), skills, fileExists: existsSync });
-for (const error of errors) console.error(`ERROR plugin.json: ${error}`);
-if (errors.length === 0) console.log("OK plugin.json");
+const errors = checkPlugin({
+  manifest: readPlugin(),
+  skills,
+  fileExists: (path) => existsSync(join(PLUGIN_DIR, path))
+});
+for (const error of errors) console.error(`ERROR ${PLUGIN_DIR}/plugin.json: ${error}`);
+if (errors.length === 0) console.log(`OK ${PLUGIN_DIR}/plugin.json`);
 process.exit(errors.length > 0 ? 1 : 0);

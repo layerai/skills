@@ -102,9 +102,10 @@ tasks:
     desc: Check the plugin manifests and MCP configs are valid JSON.
     cmd: |
       set -eu
-      for f in .claude-plugin/*.json .cursor-plugin/*.json .agents/plugins/*.json plugins/layer/plugin.json \
-        plugins/layer/mcp.json plugins/layer/.mcp.json plugins/layer/.claude-plugin/*.json \
-        plugins/layer/.cursor-plugin/*.json; do
+      for f in .claude-plugin/*.json .cursor-plugin/*.json .grok-plugin/*.json .agents/plugins/*.json \
+        plugins/layer/plugin.json plugins/layer/mcp.json plugins/layer/.mcp.json \
+        plugins/layer/.claude-plugin/*.json plugins/layer/.cursor-plugin/*.json \
+        plugins/layer/.grok-plugin/*.json; do
         jq -e . "$f" > /dev/null || { echo "invalid JSON: $f" >&2; exit 1; }
         echo "OK $f"
       done
@@ -145,8 +146,10 @@ tasks:
         `# The MCP endpoint is OAuth-walled and answers 401. Excluded by name` \
         `# rather than accepting 401 globally, which would mask real link rot.` \
         --exclude '^https://mcp\.app\.layer\.ai/mcp$' \
-        `# The OpenAI plugin portal is bot-walled and answers 403 to any non-browser client.` \
+        `# The OpenAI and Claude plugin portals are bot-walled and answer 403 to non-browser` \
+        `# clients, including CI runners.` \
         --exclude '^https://platform\.openai\.com/plugins$' \
+        --exclude '^https://claude\.ai/directory/manage$' \
         './**/*.md'
 
   # ── Commit and pull request hygiene ──

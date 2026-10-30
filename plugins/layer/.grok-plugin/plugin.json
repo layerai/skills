@@ -1,0 +1,24 @@
+{
+  "name": "layer",
+  "version": "0.2.0",
+  "description": "AI game asset creation: generate 2D, 3D, video, and audio assets and run creative workflows from your agent, powered by Layer's model-agnostic platform.",
+  "author": { "name": "Layer", "url": "https://layer.ai" },
+  "homepage": "https://layer.ai",
+  "repository": "https://github.com/layerai/skills",
+  "license": "MIT",
+  "keywords": [
+    "layer",
+    "game-assets",
+    "image-generation",
+    "3d",
+    "video",
+    "audio",
+    "creative-workflows",
+    "mcp",
+    "video-generation",
+    "pixel-art",
+    "sprites",
+    "textures",
+    "lora"
+  ]
+}

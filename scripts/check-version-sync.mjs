@@ -17,6 +17,7 @@ const sites = [
   [join(PLUGIN_DIR, "plugin.json"), (j) => j.version],
   [join(PLUGIN_DIR, ".claude-plugin/plugin.json"), (j) => j.version],
   [join(PLUGIN_DIR, ".cursor-plugin/plugin.json"), (j) => j.version],
+  [join(PLUGIN_DIR, ".grok-plugin/plugin.json"), (j) => j.version],
   [".claude-plugin/marketplace.json", (j) => j.plugins.map((p) => p.version)]
 ];
 

@@ -1,8 +1,9 @@
 # Regenerate what skills.sh.json is the source of truth for, then run the same
 # gate CI runs. Logic lives in the Taskfile, not here.
 task manifest
-generated=".claude-plugin .cursor-plugin .agents plugins/layer/plugin.json plugins/layer/.claude-plugin
-  plugins/layer/.cursor-plugin plugins/layer/.mcp.json README.md"
+generated=".claude-plugin .cursor-plugin .grok-plugin .agents plugins/layer/plugin.json
+  plugins/layer/.claude-plugin plugins/layer/.cursor-plugin plugins/layer/.grok-plugin
+  plugins/layer/.mcp.json README.md"
 # shellcheck disable=SC2086 # word splitting is the point
 git diff --cached --quiet -- $generated || {
   git add -u $generated 2> /dev/null || true

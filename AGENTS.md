@@ -228,8 +228,8 @@ tables, so `format:check` rejects correct hand-written markdown.
 `skills.sh.json` is the single source of truth for grouping and skill order, and
 `plugins/layer/plugin.json` for the plugin's identity, listing fields, and Claude-only fields
 (`extensions["com.anthropic"]`). The root marketplaces (`.claude-plugin/`, `.cursor-plugin/`,
-`.agents/`), the plugin's `.claude-plugin/`, `.cursor-plugin/` and `.mcp.json`, and the README skills
-table are generated from them (`task manifest`); never edit any of them by hand.
+`.grok-plugin/`, `.agents/`), the plugin's `.claude-plugin/`, `.cursor-plugin/`, `.grok-plugin/` and
+`.mcp.json`, and the README skills table are generated from them (`task manifest`); never edit any of them by hand.
 `plugin.json`'s own `version` is rewritten from `VERSION`. Releasing to the plugin directories is in
 [PUBLISHING.md](PUBLISHING.md).
 

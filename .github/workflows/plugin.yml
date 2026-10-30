@@ -32,8 +32,10 @@ jobs:
       - run: npm install -g @anthropic-ai/claude-code@2.1.289
       - run: task plugin:validate
       - run: task package
-      - uses: actions/upload-artifact@v4
+      # archive: false uploads the ZIP as-is. The default wraps it in a second ZIP,
+      # and the OpenAI portal rejects that wrapper as an invalid plugin package.
+      - uses: actions/upload-artifact@v7
         with:
-          name: openai-plugin-zip
           path: dist/*.zip
+          archive: false
           if-no-files-found: error

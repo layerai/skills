@@ -8,8 +8,8 @@ CI builds and validates the plugin. Listing it in a directory and every OpenAI r
    changes, and OpenAI rejects a submission that reuses a version.
 2. Update `extensions["com.openai"].publication.release_notes` in `plugins/layer/plugin.json`.
 3. `task check`, commit, and merge to `main`.
-4. Download the `openai-plugin-zip` artifact from the Plugin workflow run on `main` for the
-   OpenAI upload, or build it locally with `task package`.
+4. Download the `layer-<version>.zip` artifact from the Plugin workflow run on `main` and upload
+   it to OpenAI as is, or build it locally with `task package`.
 
 ## Anthropic: Claude plugin directory
 

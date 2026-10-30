@@ -10,7 +10,8 @@
 // runs offline). CI runs it on every pull request and on a schedule, because the
 // manifest can change without this repository changing.
 import { readFileSync } from "node:fs";
-import { skillNames } from "./lib.mjs";
+import { join } from "node:path";
+import { SKILLS_DIR, skillNames } from "./lib.mjs";
 
 const MANIFEST = "https://layer.ai/.well-known/mcp";
 
@@ -58,7 +59,7 @@ let failed = false;
 const used = new Set();
 
 for (const name of skillNames()) {
-  const path = `skills/${name}/SKILL.md`;
+  const path = join(SKILLS_DIR, name, "SKILL.md");
   const text = readFileSync(path, "utf8");
   const bad = [];
 

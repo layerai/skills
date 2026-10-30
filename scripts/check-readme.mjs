@@ -4,7 +4,7 @@
 // description. Run with --fix to rewrite it.
 import { readFileSync, writeFileSync } from "node:fs";
 import prettier from "prettier";
-import { readGroupings, readSkill } from "./lib.mjs";
+import { SKILLS_DIR, readGroupings, readSkill } from "./lib.mjs";
 
 const START = "<!-- skills:start -->";
 const END = "<!-- skills:end -->";
@@ -20,7 +20,7 @@ const render = () => {
     for (const name of group.skills) {
       const { frontmatter } = readSkill(name);
       const description = frontmatter.description.replace(/\|/g, "\\|");
-      out.push(`| [\`${name}\`](skills/${name}/SKILL.md) | ${description} |`);
+      out.push(`| [\`${name}\`](${SKILLS_DIR}/${name}/SKILL.md) | ${description} |`);
     }
     out.push("");
   }

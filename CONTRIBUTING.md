@@ -50,7 +50,7 @@ task links       # every link in the markdown resolves (runs lychee through Dock
 ```
 
 `skills.sh.json` is the source of truth for grouping. The plugin manifests and the README skills
-table are generated from it, so never edit those by hand; `task manifest` regenerates both, and the
+table are generated from it and `plugins/layer/plugin.json`, so never edit those by hand; `task manifest` regenerates both, and the
 pre-commit hook does it for you.
 
 Starting a skill: `task new NAME=layer-something` writes the skeleton, then add it to a grouping in

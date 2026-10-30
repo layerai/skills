@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // skills.sh.json is the single source of truth for how skills are grouped.
 // Every skill must appear in exactly one grouping, and every listed skill must exist.
-import { skillNames, readGroupings } from "./lib.mjs";
+import { SKILLS_DIR, skillNames, readGroupings } from "./lib.mjs";
 
 let failed = false;
 const fail = (msg) => {
@@ -34,7 +34,7 @@ for (const group of config.groupings ?? []) {
 }
 
 for (const name of onDisk) {
-  if (!seen.has(name)) fail(`skills/${name} is in no skills.sh.json grouping`);
+  if (!seen.has(name)) fail(`${SKILLS_DIR}/${name} is in no skills.sh.json grouping`);
 }
 
 if (!failed) console.log(`OK ${onDisk.size} skills across ${config.groupings.length} groupings`);

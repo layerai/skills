@@ -88,6 +88,11 @@ tasks:
     deps: [install]
     cmd: pnpm spec
 
+  plugin:
+    desc: Check plugins/layer/plugin.json against the OpenAI and Claude plugin directory requirements.
+    deps: [install]
+    cmd: pnpm plugin
+
   version:check:
     desc: Check VERSION agrees with every plugin manifest that declares one.
     deps: [install]
@@ -97,7 +102,9 @@ tasks:
     desc: Check the plugin manifests and MCP configs are valid JSON.
     cmd: |
       set -eu
-      for f in .claude-plugin/*.json .cursor-plugin/*.json .codex-plugin/*.json mcp.json .mcp.json; do
+      for f in .claude-plugin/*.json .cursor-plugin/*.json .agents/plugins/*.json plugins/layer/plugin.json \
+        plugins/layer/mcp.json plugins/layer/.mcp.json plugins/layer/.claude-plugin/*.json \
+        plugins/layer/.cursor-plugin/*.json; do
         jq -e . "$f" > /dev/null || { echo "invalid JSON: $f" >&2; exit 1; }
         echo "OK $f"
       done
@@ -138,6 +145,8 @@ tasks:
         `# The MCP endpoint is OAuth-walled and answers 401. Excluded by name` \
         `# rather than accepting 401 globally, which would mask real link rot.` \
         --exclude '^https://mcp\.app\.layer\.ai/mcp$' \
+        `# The OpenAI plugin portal is bot-walled and answers 403 to any non-browser client.` \
+        --exclude '^https://platform\.openai\.com/plugins$' \
         './**/*.md'
 
   # ── Commit and pull request hygiene ──
@@ -177,11 +186,11 @@ tasks:
     requires:
       vars: [NAME]
     status:
-      - test -f skills/{{.NAME}}/SKILL.md
+      - test -f plugins/layer/skills/{{.NAME}}/SKILL.md
     cmds:
-      - mkdir -p skills/{{.NAME}}
+      - mkdir -p plugins/layer/skills/{{.NAME}}
       - |
-        cat > skills/{{.NAME}}/SKILL.md <<'EOF'
+        cat > plugins/layer/skills/{{.NAME}}/SKILL.md <<'EOF'
         ---
         name: {{.NAME}}
         description: "Use when TODO: triggering conditions only, never a summary of the workflow. Under 500 characters. Rich in the words a user actually types. Keywords: TODO."
@@ -212,7 +221,7 @@ tasks:
 
         - TODO.
         EOF
-      - echo "created skills/{{.NAME}}/SKILL.md"
+      - echo "created plugins/layer/skills/{{.NAME}}/SKILL.md"
       - echo "next add {{.NAME}} to a grouping in skills.sh.json, then run task manifest"
 
   words:
@@ -222,7 +231,7 @@ tasks:
     cmds:
       - |
         set -eu
-        for f in skills/{{default "*" .NAME}}/SKILL.md; do
+        for f in plugins/layer/skills/{{default "*" .NAME}}/SKILL.md; do
           # awk sums the words itself rather than piping to `wc -w`: wc pads its
           # output, and printf %d reads a space-padded value as 0. Same count as
           # the `awk ... | wc -w` measurement AGENTS.md documents.
@@ -272,6 +281,25 @@ tasks:
       - task: manifest
       - task: version:check
       - echo "version set to {{.VERSION}}"
+
+  package:
+    desc: Write dist/layer-<version>.zip, the package uploaded to the OpenAI plugin portal.
+    deps: [install]
+    cmd: pnpm package
+
+  plugin:validate:
+    desc: >-
+      Validate the plugin with the Agent Plugins schemas and Claude's strict
+      validator. Outside `check` because it needs the network and the claude CLI.
+    cmd: |
+      set -eu
+      tmp=$(mktemp -d)
+      curl -fsSL https://agent-plugins.org/schemas/1.0.0/plugin.schema.json -o "$tmp/plugin.schema.json"
+      curl -fsSL https://agent-plugins.org/schemas/1.0.0/mcp.schema.json -o "$tmp/mcp.schema.json"
+      npx --yes ajv-cli@5.0.0 validate --spec=draft2020 -s "$tmp/plugin.schema.json" -d plugins/layer/plugin.json
+      npx --yes ajv-cli@5.0.0 validate --spec=draft2020 -s "$tmp/mcp.schema.json" -d plugins/layer/mcp.json
+      claude plugin validate plugins/layer --strict
+      claude plugin validate . --strict
 
   # ── Housekeeping ──
 

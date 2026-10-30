@@ -1,98 +1,98 @@
 #!/usr/bin/env node
-// Generates the plugin manifests from skills.sh.json and VERSION.
-// skills.sh.json is the source of truth, so these files are never edited by hand.
+// Generates the plugin manifests from plugin.json, mcp.json, skills.sh.json, and VERSION.
+// plugin.json holds the plugin's identity and directory listings, mcp.json the MCP
+// servers, skills.sh.json the skill order, VERSION the version. The generated files are
+// never edited by hand, and plugin.json's own `version` is rewritten from VERSION.
 //
-// The Claude Code marketplace picker groups by plugin entry and sorts group names
-// alphabetically, so plugin names carry a two-digit position prefix to preserve the
-// skills.sh.json order. Inserting a grouping renumbers the ones after it.
-import { readFileSync, writeFileSync } from "node:fs";
+// Every client gets the same single plugin from PLUGIN_DIR. The root marketplaces only
+// point at it, so an install copies that folder and nothing else from the repository.
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import prettier from "prettier";
-import { readGroupings, version } from "./lib.mjs";
+import { PLUGIN_DIR, readGroupings, readJson, readPlugin, version } from "./lib.mjs";
 
 const check = process.argv.includes("--check");
 const v = version();
 const config = readGroupings();
+const plugin = { ...readPlugin(), version: v };
 
-const slug = (title) =>
-  title
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
+const source = `./${PLUGIN_DIR}`;
+const owner = { name: "Layer", url: "https://layer.ai" };
+const marketplaceDescription =
+  "Layer skills: creative craft for AI game and entertainment asset generation.";
 
 const marketplace = {
   name: "layer",
-  owner: { name: "Layer", url: "https://layer.ai" },
-  description: "Layer skills: creative craft for AI game and entertainment asset generation.",
-  plugins: config.groupings.map((group, i) => ({
-    name: `${String(i + 1).padStart(2, "0")}.-${slug(group.title)}`,
-    source: "./",
-    description: group.description,
-    version: v,
-    skills: group.skills.map((name) => `./skills/${name}`)
-  }))
+  owner,
+  description: marketplaceDescription,
+  plugins: [{ name: plugin.name, source, description: plugin.description, version: v }]
+};
+
+const cursorMarketplace = {
+  name: "layer",
+  owner,
+  metadata: { description: marketplaceDescription },
+  plugins: [{ name: plugin.name, source, description: plugin.description }]
+};
+
+// Codex and ChatGPT read the plugin's plugin.json and mcp.json; this marketplace lists them.
+const openaiMarketplace = {
+  name: "layer",
+  interface: { displayName: "Layer" },
+  plugins: [
+    {
+      name: plugin.name,
+      source: { source: "local", path: source },
+      policy: { installation: "AVAILABLE", authentication: "ON_INSTALL" },
+      category: plugin.extensions["com.openai"].interface.category
+    }
+  ]
+};
+
+// Claude names the Agent Plugins `streamable-http` transport `http`, and drops a
+// remote server that has no type.
+const CLAUDE_SERVER_TYPES = { "streamable-http": "http", sse: "sse" };
+const claudeMcp = {
+  mcpServers: Object.fromEntries(
+    Object.entries(readJson(join(PLUGIN_DIR, "mcp.json")).mcpServers).map(([name, server]) => {
+      const type = CLAUDE_SERVER_TYPES[server.type];
+      if (!type)
+        throw new Error(`mcp.json: server "${name}" has no Claude type for "${server.type}"`);
+      return [name, { ...server, type }];
+    })
+  )
 };
 
 const allSkills = config.groupings.flatMap((g) => g.skills).map((n) => `./skills/${n}`);
 
 const cursor = {
-  name: "layer",
+  name: plugin.name,
   displayName: "Layer",
   version: v,
-  description:
-    "Generate game and entertainment assets with Layer: images, video, 3D, and audio, with the craft knowledge to direct them.",
-  author: { name: "Layer", url: "https://layer.ai" },
-  homepage: "https://layer.ai",
-  repository: "https://github.com/layerai/skills",
-  license: "MIT",
+  description: plugin.description,
+  author: plugin.author,
+  homepage: plugin.homepage,
+  repository: plugin.repository,
+  license: plugin.license,
   skills: allSkills,
-  keywords: [
-    "layer",
-    "game-assets",
-    "image-generation",
-    "video-generation",
-    "3d",
-    "audio",
-    "pixel-art",
-    "sprites",
-    "textures",
-    "lora",
-    "mcp"
-  ]
+  keywords: plugin.keywords
 };
 
 const claudePlugin = {
-  name: "layer",
-  displayName: "Layer",
-  version: v,
-  description: cursor.description,
-  author: cursor.author,
-  homepage: "https://layer.ai",
-  repository: cursor.repository,
-  license: "MIT",
-  skills: allSkills,
+  ...cursor,
   mcpServers: "./.mcp.json",
-  keywords: cursor.keywords
+  ...plugin.extensions["com.anthropic"]
 };
 
-const codexPlugin = {
-  name: "layer",
-  displayName: "Layer",
-  version: v,
-  description: cursor.description,
-  author: cursor.author,
-  homepage: "https://layer.ai",
-  repository: cursor.repository,
-  license: "MIT",
-  skills: allSkills,
-  mcpServers: "./.mcp.json",
-  keywords: cursor.keywords
-};
-
+const inPlugin = (path) => join(PLUGIN_DIR, path);
 const targets = [
+  [inPlugin("plugin.json"), plugin],
+  [inPlugin(".claude-plugin/plugin.json"), claudePlugin],
+  [inPlugin(".cursor-plugin/plugin.json"), cursor],
+  [inPlugin(".mcp.json"), claudeMcp],
   [".claude-plugin/marketplace.json", marketplace],
-  [".claude-plugin/plugin.json", claudePlugin],
-  [".cursor-plugin/plugin.json", cursor],
-  [".codex-plugin/plugin.json", codexPlugin]
+  [".cursor-plugin/marketplace.json", cursorMarketplace],
+  [".agents/plugins/marketplace.json", openaiMarketplace]
 ];
 
 // Format through prettier with the repo config, so a generated manifest and a
@@ -120,6 +120,7 @@ for (const [path, value] of targets) {
       console.log(`OK ${path}`);
     }
   } else {
+    mkdirSync(dirname(path), { recursive: true });
     writeFileSync(path, next);
     console.log(`wrote ${path}`);
   }

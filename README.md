@@ -32,6 +32,13 @@ codex plugin marketplace add layerai/skills
 codex plugin add layer@layer
 ```
 
+Grok Build:
+
+```bash
+grok plugin marketplace add https://github.com/layerai/skills
+grok plugin install layer --trust
+```
+
 ## Prerequisites
 
 These skills call the Layer MCP server at `https://mcp.app.layer.ai/mcp` over streamable HTTP,

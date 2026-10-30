@@ -102,9 +102,10 @@ tasks:
     desc: Check the plugin manifests and MCP configs are valid JSON.
     cmd: |
       set -eu
-      for f in .claude-plugin/*.json .cursor-plugin/*.json .agents/plugins/*.json plugins/layer/plugin.json \
-        plugins/layer/mcp.json plugins/layer/.mcp.json plugins/layer/.claude-plugin/*.json \
-        plugins/layer/.cursor-plugin/*.json; do
+      for f in .claude-plugin/*.json .cursor-plugin/*.json .grok-plugin/*.json .agents/plugins/*.json \
+        plugins/layer/plugin.json plugins/layer/mcp.json plugins/layer/.mcp.json \
+        plugins/layer/.claude-plugin/*.json plugins/layer/.cursor-plugin/*.json \
+        plugins/layer/.grok-plugin/*.json; do
         jq -e . "$f" > /dev/null || { echo "invalid JSON: $f" >&2; exit 1; }
         echo "OK $f"
       done

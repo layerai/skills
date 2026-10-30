@@ -35,6 +35,21 @@ const cursorMarketplace = {
   plugins: [{ name: plugin.name, source, description: plugin.description }]
 };
 
+const grokMarketplace = {
+  name: "layer",
+  description: marketplaceDescription,
+  owner,
+  plugins: [
+    {
+      name: plugin.name,
+      source: { type: "local", path: source },
+      description: plugin.description,
+      homepage: plugin.homepage,
+      keywords: plugin.keywords
+    }
+  ]
+};
+
 // Codex and ChatGPT read the plugin's plugin.json and mcp.json; this marketplace lists them.
 const openaiMarketplace = {
   name: "layer",
@@ -84,14 +99,29 @@ const claudePlugin = {
   ...plugin.extensions["com.anthropic"]
 };
 
+// Grok Build discovers skills/ and the MCP server in .mcp.json from the plugin folder by
+// default, so its manifest carries identity only.
+const grokPlugin = {
+  name: plugin.name,
+  version: v,
+  description: plugin.description,
+  author: plugin.author,
+  homepage: plugin.homepage,
+  repository: plugin.repository,
+  license: plugin.license,
+  keywords: plugin.keywords
+};
+
 const inPlugin = (path) => join(PLUGIN_DIR, path);
 const targets = [
   [inPlugin("plugin.json"), plugin],
   [inPlugin(".claude-plugin/plugin.json"), claudePlugin],
   [inPlugin(".cursor-plugin/plugin.json"), cursor],
+  [inPlugin(".grok-plugin/plugin.json"), grokPlugin],
   [inPlugin(".mcp.json"), claudeMcp],
   [".claude-plugin/marketplace.json", marketplace],
   [".cursor-plugin/marketplace.json", cursorMarketplace],
+  [".grok-plugin/marketplace.json", grokMarketplace],
   [".agents/plugins/marketplace.json", openaiMarketplace]
 ];
 

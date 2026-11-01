@@ -1,7 +1,10 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-export const SKILLS_DIR = "skills";
+// The plugin is one folder, so a client that installs it (and a directory that scans
+// it) sees only what ships, not the repository's tooling.
+export const PLUGIN_DIR = "plugins/layer";
+export const SKILLS_DIR = join(PLUGIN_DIR, "skills");
 
 export function skillNames() {
   return readdirSync(SKILLS_DIR, { withFileTypes: true })
@@ -49,4 +52,12 @@ export function readGroupings() {
 
 export function version() {
   return readFileSync("VERSION", "utf8").trim();
+}
+
+export function readJson(path) {
+  return JSON.parse(readFileSync(path, "utf8"));
+}
+
+export function readPlugin() {
+  return readJson(join(PLUGIN_DIR, "plugin.json"));
 }

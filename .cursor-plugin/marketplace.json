@@ -1,0 +1,14 @@
+{
+  "name": "layer",
+  "owner": { "name": "Layer", "url": "https://layer.ai" },
+  "metadata": {
+    "description": "Layer skills: creative craft for AI game and entertainment asset generation."
+  },
+  "plugins": [
+    {
+      "name": "layer",
+      "source": "./plugins/layer",
+      "description": "AI game asset creation: generate 2D, 3D, video, and audio assets and run creative workflows from your agent, powered by Layer's model-agnostic platform."
+    }
+  ]
+}

@@ -14,23 +14,54 @@
     },
     {
       "title": "Images",
-      "description": "Generate stills and change the ones you already have: prompting, sizing, references, masked edits, reframing, upscaling, and layers.",
-      "skills": ["layer-image", "layer-image-editing"]
+      "description": "Generate stills and change the ones you already have: prompting, sizing, references, masked edits, reframing, upscaling, layers, and exact text in a brand font.",
+      "skills": ["layer-image", "layer-image-editing", "layer-typography"]
     },
     {
       "title": "Game art",
-      "description": "Art that has to sit in a system: characters and casts, environments and parallax, game UI, pixel sprites and sheets, and seamless textures.",
-      "skills": ["layer-game-assets", "layer-pixel-art", "layer-textures"]
+      "description": "Art that has to sit in a system: characters and casts, environments, parallax and skyboxes, isometric and hex tilesets, 9-slice UI and icon sets, pixel sprites, HD sprite animation, VFX, and seamless textures.",
+      "skills": [
+        "layer-game-assets",
+        "layer-environments",
+        "layer-tilesets",
+        "layer-game-ui",
+        "layer-pixel-art",
+        "layer-sprite-animation",
+        "layer-vfx",
+        "layer-textures"
+      ]
     },
     {
       "title": "Video and audio",
-      "description": "Motion and sound: animating stills, camera and loops, sound effects, music, speech, and cutting shots into one finished video.",
-      "skills": ["layer-video", "layer-audio", "layer-video-timeline"]
+      "description": "Generate motion and sound: animating stills, camera and shot language, multi-shot continuity, repairing a clip instead of rerolling it, talking characters and lip sync, sound effects, music, and speech.",
+      "skills": [
+        "layer-video",
+        "layer-video-direction",
+        "layer-video-continuity",
+        "layer-video-fixes",
+        "layer-talking-characters",
+        "layer-audio"
+      ]
+    },
+    {
+      "title": "Editing and motion graphics",
+      "description": "Finish what you generated: cut shots into one video, give the cut a consistent look, animate logos, titles and end cards in the brand font, and render one template into many variants.",
+      "skills": [
+        "layer-video-timeline",
+        "layer-video-looks",
+        "layer-motion-graphics",
+        "layer-motion-templates"
+      ]
     },
     {
       "title": "3D",
       "description": "Meshes for a game engine: generation from text or image, remeshing, retexturing, rigging, and animation.",
       "skills": ["layer-3d"]
+    },
+    {
+      "title": "Marketing and live ops",
+      "description": "Creative that sells and sustains a game: user-acquisition ad matrices, store listing art, localised assets and dubs, and the upgrade chains and seasonal reskins a live game ships every week.",
+      "skills": ["layer-ua-creatives", "layer-store-assets", "layer-localization", "layer-live-ops"]
     },
     {
       "title": "Consistency and pipelines",

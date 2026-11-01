@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 
 fail=0
 
-for skill in skills/*/; do
+for skill in plugins/layer/skills/*/; do
   [ -e "${skill}SKILL.md" ] || continue
   while IFS= read -r -d '' file; do
     [ "$file" = "${skill}SKILL.md" ] && continue

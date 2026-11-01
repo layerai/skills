@@ -1,0 +1,28 @@
+{
+  "name": "layer",
+  "description": "Layer skills: creative craft for AI game and entertainment asset generation.",
+  "owner": { "name": "Layer", "url": "https://layer.ai" },
+  "plugins": [
+    {
+      "name": "layer",
+      "source": { "type": "local", "path": "./plugins/layer" },
+      "description": "AI game asset creation: generate 2D, 3D, video, and audio assets and run creative workflows from your agent, powered by Layer's model-agnostic platform.",
+      "homepage": "https://layer.ai",
+      "keywords": [
+        "layer",
+        "game-assets",
+        "image-generation",
+        "3d",
+        "video",
+        "audio",
+        "creative-workflows",
+        "mcp",
+        "video-generation",
+        "pixel-art",
+        "sprites",
+        "textures",
+        "lora"
+      ]
+    }
+  ]
+}

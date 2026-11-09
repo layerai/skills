@@ -8,6 +8,11 @@
       "skills": ["layer"]
     },
     {
+      "title": "Agents",
+      "description": "Hand a whole job to a Layer agent, such as a playable ad or a directed video: brief it, relay its questions, leave its priced plan to the user, and pass on what it delivers.",
+      "skills": ["layer-agents"]
+    },
+    {
       "title": "Direction",
       "description": "Agree a look before generating at volume: moodboards, storyboards, colour, era, and framing.",
       "skills": ["layer-art-direction"]

@@ -32,7 +32,7 @@ const NOT_TOOLS = new Set([
 
 const VERB_PREFIXED = new RegExp(
   "^(get|list|create|execute|estimate|start|cancel|render|upload|request|score|pack|" +
-    "split|update|delete|add|remove|invite|suspend|reactivate|set|import)_[a-z0-9_]+$"
+    "split|update|delete|add|remove|invite|suspend|reactivate|set|import|send)_[a-z0-9_]+$"
 );
 
 const response = await fetch(MANIFEST, { headers: { accept: "application/json" } });

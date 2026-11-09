@@ -74,6 +74,14 @@ Connect to Layer and learn the generation loop every other skill builds on: mode
 | ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`layer`](plugins/layer/skills/layer/SKILL.md) | Use when generating or editing game and entertainment assets on Layer through MCP: images, video, 3D meshes, audio, sprites, textures, or marketing creative. Also when choosing a Layer base model, pricing a run in Creative Units before spending them, uploading reference files, polling a generation, applying a trained style, or recovering from MODEL_NOT_FOUND, INSUFFICIENT_BALANCE, RATE_LIMITED, or a silently degraded reference set. |
 
+### Agents
+
+Hand a whole job to a Layer agent, such as a playable ad or a directed video: brief it, relay its questions, leave its priced plan to the user, and pass on what it delivers.
+
+| Skill                                                        | Use when                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [`layer-agents`](plugins/layer/skills/layer-agents/SKILL.md) | Use when a whole job should go to a Layer agent instead of single generations: a playable ad or HTML5 mini-game, a game trailer, video ad, cutscene, app-store preview, 3D reveal or motion-design video. Also when continuing, checking on, approving a plan in, or stopping a Layer agent's turn, or recovering an agent's files after a restart. Keywords: agent, delegate, playable, playable ad, trailer, motion design, session, build. |
+
 ### Direction
 
 Agree a look before generating at volume: moodboards, storyboards, colour, era, and framing.

@@ -9,6 +9,7 @@
   "license": "MIT",
   "skills": [
     "./skills/layer",
+    "./skills/layer-agents",
     "./skills/layer-art-direction",
     "./skills/layer-image",
     "./skills/layer-image-editing",

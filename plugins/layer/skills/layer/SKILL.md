@@ -124,6 +124,7 @@ set did not apply, say which and why. Never report a degraded set as applied.
 | A texture that repeats without a seam                       | `layer-textures`       |
 | A look held across a whole set, or a trained style          | `layer-reference-sets` |
 | A saved multi-step pipeline                                 | `layer-workflows`      |
+| A finished playable ad or directed video, built end to end  | `layer-agents`         |
 | Clips cut into one finished video                           | `layer-video-timeline` |
 | A direction, a moodboard, or a storyboard before committing | `layer-art-direction`  |
 | To judge a batch before delivering it                       | `layer-quality`        |
